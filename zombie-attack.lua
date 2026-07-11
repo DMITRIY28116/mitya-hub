@@ -14,7 +14,6 @@ local LocalPlayer = Players.LocalPlayer
 
 -- ========== HTTP-ЗАГРУЗЧИК (ИСПРАВЛЕН!) ==========
 local function httpGet(url)
-    -- Метод 1: game:HttpGet (работает в Xeno)
     local success1, result1 = pcall(function()
         return game:HttpGet(url, true)
     end)
@@ -22,7 +21,6 @@ local function httpGet(url)
         return result1
     end
     
-    -- Метод 2: syn.request (Solara/Fluxus)
     local success2, result2 = pcall(function()
         return syn.request({Url = url, Method = "GET"}).Body
     end)
@@ -30,7 +28,6 @@ local function httpGet(url)
         return result2
     end
     
-    -- Метод 3: http_request
     local success3, result3 = pcall(function()
         return http_request({Url = url, Method = "GET"}).Body
     end)
@@ -56,7 +53,6 @@ local toggleStates = {
     Reach = false,
 }
 
--- ========== ПЕРЕМЕННЫЕ ==========
 local noclipConn = nil
 local farmConn = nil
 local hitboxConn = nil
@@ -91,7 +87,6 @@ if not screenGui.Parent then
     screenGui.Parent = LocalPlayer.PlayerGui
 end
 
--- Главное окно
 local mainFrame = Instance.new("Frame")
 mainFrame.Name = "MainFrame"
 mainFrame.Size = UDim2.new(0, 420, 0, 550)
@@ -122,7 +117,6 @@ local titleCorner = Instance.new("UICorner")
 titleCorner.CornerRadius = UDim.new(0, 12)
 titleCorner.Parent = titleBar
 
--- Логотип
 local logo = Instance.new("Frame")
 logo.Size = UDim2.new(0, 28, 0, 28)
 logo.Position = UDim2.new(0, 10, 0.5, -14)
@@ -161,14 +155,13 @@ gameLabel.Font = Enum.Font.Gotham
 gameLabel.TextXAlignment = Enum.TextXAlignment.Right
 gameLabel.Parent = titleBar
 
--- Кнопка закрытия
 local closeBtn = Instance.new("TextButton")
 closeBtn.Size = UDim2.new(0, 28, 0, 28)
 closeBtn.Position = UDim2.new(1, -36, 0.5, -14)
 closeBtn.BackgroundColor3 = Color3.fromRGB(60, 20, 20)
 closeBtn.BackgroundTransparency = 0.3
 closeBtn.BorderSizePixel = 0
-closeBtn.Text = "✕"
+closeBtn.Text = "X"
 closeBtn.TextColor3 = Color3.fromRGB(255, 80, 80)
 closeBtn.TextSize = 16
 closeBtn.Font = Enum.Font.GothamBold
@@ -179,14 +172,13 @@ closeBtn.MouseButton1Click:Connect(function()
     mainFrame.Visible = false
 end)
 
--- Кнопка сворачивания
 local minBtn = Instance.new("TextButton")
 minBtn.Size = UDim2.new(0, 28, 0, 28)
 minBtn.Position = UDim2.new(1, -72, 0.5, -14)
 minBtn.BackgroundColor3 = Color3.fromRGB(40, 10, 60)
 minBtn.BackgroundTransparency = 0.3
 minBtn.BorderSizePixel = 0
-minBtn.Text = "−"
+minBtn.Text = "-"
 minBtn.TextColor3 = Color3.fromRGB(180, 140, 220)
 minBtn.TextSize = 18
 minBtn.Font = Enum.Font.Gotham
@@ -200,7 +192,6 @@ minBtn.MouseButton1Click:Connect(function()
     TweenService:Create(mainFrame, TweenInfo.new(0.3, Enum.EasingStyle.Quad), {Size = targetSize}):Play()
 end)
 
--- Перетаскивание
 local dragToggle, dragInput, dragStart, startPos
 titleBar.InputBegan:Connect(function(input)
     if input.UserInputType == Enum.UserInputType.MouseButton1 then
@@ -225,7 +216,7 @@ UserInputService.InputChanged:Connect(function(input)
     end
 end)
 
--- ========== КОНТЕНТ (СКРОЛЛ) ==========
+-- ========== КОНТЕНТ ==========
 local contentFrame = Instance.new("ScrollingFrame")
 contentFrame.Size = UDim2.new(1, -16, 1, -95)
 contentFrame.Position = UDim2.new(0, 8, 0, 55)
@@ -295,7 +286,7 @@ local function createSection(title)
     label.Position = UDim2.new(0.04, 0, 0, 0)
     label.BackgroundTransparency = 1
     label.Font = Enum.Font.GothamSemibold
-    label.Text = "▸ " .. string.upper(title)
+    label.Text = "> " .. string.upper(title)
     label.TextColor3 = Color3.fromRGB(180, 100, 255)
     label.TextSize = 10
     label.TextXAlignment = Enum.TextXAlignment.Left
@@ -352,7 +343,7 @@ local function createActionButton(label, callback)
     btn.BackgroundColor3 = Color3.fromRGB(45, 10, 70)
     btn.BackgroundTransparency = 0.3
     btn.BorderSizePixel = 0
-    btn.Text = "  ▸ " .. label
+    btn.Text = "  > " .. label
     btn.TextColor3 = Color3.fromRGB(220, 200, 255)
     btn.TextSize = 11
     btn.Font = Enum.Font.Gotham
@@ -388,13 +379,10 @@ local function updateIndicator(ind, state)
     end
 end
 
--- ═══════════════════════════════════════════════════════════════
--- СЕКЦИИ И КНОПКИ
--- ═══════════════════════════════════════════════════════════════
+-- ========== СЕКЦИИ И КНОПКИ ==========
 
 createSection("Main Mods")
 
--- Kill Platform
 createToggleButton("Kill Platform", function(btn, ind)
     toggleStates.KillPlatform = not toggleStates.KillPlatform
     updateIndicator(ind, toggleStates.KillPlatform)
@@ -434,7 +422,6 @@ createToggleButton("Kill Platform", function(btn, ind)
     end
 end)
 
--- Steal Kills
 createToggleButton("Steal Kills", function(btn, ind)
     toggleStates.StealKills = not toggleStates.StealKills
     updateIndicator(ind, toggleStates.StealKills)
@@ -470,7 +457,6 @@ createToggleButton("Steal Kills", function(btn, ind)
     end
 end)
 
--- Auto Farm
 createToggleButton("Auto Farm", function(btn, ind)
     toggleStates.AutoFarm = not toggleStates.AutoFarm
     updateIndicator(ind, toggleStates.AutoFarm)
@@ -531,7 +517,6 @@ createToggleButton("Auto Farm", function(btn, ind)
             if farmConn then farmConn:Disconnect(); farmConn = nil end
         end)
         
-        -- Обнуление скорости
         task.spawn(function()
             while toggleStates.AutoFarm do
                 task.wait()
@@ -556,7 +541,6 @@ end)
 
 createSection("Weapon Mods")
 
--- No Recoil
 createToggleButton("No Recoil", function(btn, ind)
     toggleStates.NoRecoil = not toggleStates.NoRecoil
     updateIndicator(ind, toggleStates.NoRecoil)
@@ -593,7 +577,6 @@ createToggleButton("No Recoil", function(btn, ind)
     end
 end)
 
--- Equip All Guns
 createActionButton("Equip All Guns", function()
     pcall(function()
         for _, thing in pairs(ReplicatedStorage.Guns:GetChildren()) do
@@ -603,7 +586,6 @@ createActionButton("Equip All Guns", function()
     logConsole("All guns equipped", Color3.fromRGB(80, 255, 80))
 end)
 
--- Equip All Knives
 createActionButton("Equip All Knives", function()
     pcall(function()
         for _, thing in pairs(ReplicatedStorage.Knives:GetChildren()) do
@@ -613,7 +595,6 @@ createActionButton("Equip All Knives", function()
     logConsole("All knives equipped", Color3.fromRGB(80, 255, 80))
 end)
 
--- Hitbox Expand
 createToggleButton("Expand Zombie Hitboxes", function(btn, ind)
     toggleStates.HitboxExpand = not toggleStates.HitboxExpand
     updateIndicator(ind, toggleStates.HitboxExpand)
@@ -658,7 +639,6 @@ createToggleButton("Expand Zombie Hitboxes", function(btn, ind)
     end
 end)
 
--- Weapon Reach Extender
 createToggleButton("Weapon Reach Extender", function(btn, ind)
     toggleStates.Reach = not toggleStates.Reach
     updateIndicator(ind, toggleStates.Reach)
@@ -690,7 +670,6 @@ end)
 
 createSection("Local Player Mods")
 
--- Fly Mode (ИСПРАВЛЕН!)
 createToggleButton("Fly Mode (E)", function(btn, ind)
     toggleStates.Fly = not toggleStates.Fly
     updateIndicator(ind, toggleStates.Fly)
@@ -705,10 +684,10 @@ createToggleButton("Fly Mode (E)", function(btn, ind)
                     pcall(fn)
                     logConsole("Fly: Press E to toggle", Color3.fromRGB(80, 180, 255))
                 else
-                    logConsole("Fly: Script error - " .. tostring(err), Color3.fromRGB(255, 80, 80))
+                    logConsole("Fly: Error - " .. tostring(err), Color3.fromRGB(255, 80, 80))
                 end
             else
-                logConsole("Fly: Failed to load script", Color3.fromRGB(255, 80, 80))
+                logConsole("Fly: Failed to load", Color3.fromRGB(255, 80, 80))
             end
         end)
     else
@@ -716,7 +695,6 @@ createToggleButton("Fly Mode (E)", function(btn, ind)
     end
 end)
 
--- NoClip
 createToggleButton("NoClip", function(btn, ind)
     toggleStates.Noclip = not toggleStates.Noclip
     updateIndicator(ind, toggleStates.Noclip)
@@ -735,7 +713,6 @@ createToggleButton("NoClip", function(btn, ind)
     end
 end)
 
--- Low Gravity
 createToggleButton("Low Gravity", function(btn, ind)
     toggleStates.Gravity = not toggleStates.Gravity
     updateIndicator(ind, toggleStates.Gravity)
@@ -749,7 +726,6 @@ createToggleButton("Low Gravity", function(btn, ind)
     end
 end)
 
--- Super Speed
 createToggleButton("Super Speed", function(btn, ind)
     toggleStates.Speed = not toggleStates.Speed
     updateIndicator(ind, toggleStates.Speed)
@@ -763,7 +739,6 @@ createToggleButton("Super Speed", function(btn, ind)
     logConsole(toggleStates.Speed and "Speed: 60" or "Speed: Normal", toggleStates.Speed and Color3.fromRGB(30, 180, 30) or Color3.fromRGB(150, 30, 30))
 end)
 
--- Super Jump
 createToggleButton("Super Jump", function(btn, ind)
     toggleStates.Jump = not toggleStates.Jump
     updateIndicator(ind, toggleStates.Jump)
@@ -777,7 +752,6 @@ createToggleButton("Super Jump", function(btn, ind)
     logConsole(toggleStates.Jump and "Jump: 100" or "Jump: Normal", toggleStates.Jump and Color3.fromRGB(30, 180, 30) or Color3.fromRGB(150, 30, 30))
 end)
 
--- B-Tools (ИСПРАВЛЕН!)
 createActionButton("B-Tools", function()
     task.spawn(function()
         local code = httpGet("https://pastebin.com/raw/T0qaXjAR")
@@ -795,7 +769,6 @@ createActionButton("B-Tools", function()
     end)
 end)
 
--- Teleport to Map Center
 createActionButton("Teleport to Map Center", function()
     local char = LocalPlayer.Character
     if not char then return end

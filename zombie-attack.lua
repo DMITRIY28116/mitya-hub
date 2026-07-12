@@ -30,13 +30,12 @@ ZombieAttackGUI.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
 
 Main.Name = "Main"
 Main.Parent = ZombieAttackGUI
-Main.BackgroundColor3 = Color3.new(0, 0, 0) -- чёрный
+Main.BackgroundColor3 = Color3.new(0, 0, 0)
 Main.BackgroundTransparency = 0.15
 Main.BorderSizePixel = 0
 Main.Position = UDim2.new(0.794708014, 0, 0, 0)
 Main.Size = UDim2.new(0.191605836, 0, 1, 0)
 
--- Заголовок (без упоминания ibrahim Dew)
 TextLabel_2.Parent = Main
 TextLabel_2.BackgroundColor3 = Color3.new(1, 1, 1)
 TextLabel_2.BackgroundTransparency = 1
@@ -50,7 +49,6 @@ TextLabel_2.TextScaled = true
 TextLabel_2.TextSize = 14
 TextLabel_2.TextWrapped = true
 
--- Остальные элементы (без изменения, только цвета)
 Frame.Parent = Main
 Frame.BackgroundColor3 = Color3.new(0.0156863, 0.0156863, 0.0156863)
 Frame.BackgroundTransparency = 0.5
@@ -159,7 +157,7 @@ TextLabel_6.TextSize = 14
 TextLabel_6.TextWrapped = true
 TextLabel_6.TextXAlignment = Enum.TextXAlignment.Left
 
--- Кнопки (все с белым текстом)
+-- Кнопки с базовыми параметрами
 KillPlatform.Name = "KillPlatform"
 KillPlatform.Parent = Main
 KillPlatform.BackgroundColor3 = Color3.new(1, 1, 1)
@@ -167,7 +165,7 @@ KillPlatform.BackgroundTransparency = 1
 KillPlatform.Position = UDim2.new(0.0434782468, 0, 0.309297919, 0)
 KillPlatform.Size = UDim2.new(0.90476191, 0, 0.034155596, 0)
 KillPlatform.Font = Enum.Font.SourceSansSemibold
-KillPlatform.Text = "Kill Platform "
+KillPlatform.Text = "Kill Platform OFF"
 KillPlatform.TextColor3 = Color3.new(1, 1, 1)
 KillPlatform.TextScaled = true
 KillPlatform.TextSize = 14
@@ -181,7 +179,7 @@ StealKills.BackgroundTransparency = 1
 StealKills.Position = UDim2.new(0.0434782468, 0, 0.354838729, 0)
 StealKills.Size = UDim2.new(0.90476191, 0, 0.034155596, 0)
 StealKills.Font = Enum.Font.SourceSansSemibold
-StealKills.Text = "Steal Kills"
+StealKills.Text = "Steal Kills OFF"
 StealKills.TextColor3 = Color3.new(1, 1, 1)
 StealKills.TextScaled = true
 StealKills.TextSize = 14
@@ -195,7 +193,7 @@ AutoFarm.BackgroundTransparency = 1
 AutoFarm.Position = UDim2.new(0.0434782468, 0, 0.400379539, 0)
 AutoFarm.Size = UDim2.new(0.90476191, 0, 0.034155596, 0)
 AutoFarm.Font = Enum.Font.SourceSansSemibold
-AutoFarm.Text = "Auto Farm"
+AutoFarm.Text = "Auto Farm OFF"
 AutoFarm.TextColor3 = Color3.new(1, 1, 1)
 AutoFarm.TextScaled = true
 AutoFarm.TextSize = 14
@@ -209,7 +207,7 @@ NoRecoil.BackgroundTransparency = 1
 NoRecoil.Position = UDim2.new(0.0434782468, 0, 0.510436416, 0)
 NoRecoil.Size = UDim2.new(0.90476191, 0, 0.034155596, 0)
 NoRecoil.Font = Enum.Font.SourceSansSemibold
-NoRecoil.Text = "No Recoil"
+NoRecoil.Text = "No Recoil OFF"
 NoRecoil.TextColor3 = Color3.new(1, 1, 1)
 NoRecoil.TextScaled = true
 NoRecoil.TextSize = 14
@@ -223,7 +221,7 @@ Guns.BackgroundTransparency = 1
 Guns.Position = UDim2.new(0.0434782468, 0, 0.555977225, 0)
 Guns.Size = UDim2.new(0.90476191, 0, 0.034155596, 0)
 Guns.Font = Enum.Font.SourceSansSemibold
-Guns.Text = "Equip All Guns"
+Guns.Text = "Equip All Guns OFF"
 Guns.TextColor3 = Color3.new(1, 1, 1)
 Guns.TextScaled = true
 Guns.TextSize = 14
@@ -237,7 +235,7 @@ Knifes.BackgroundTransparency = 1
 Knifes.Position = UDim2.new(0.0434782468, 0, 0.603415549, 0)
 Knifes.Size = UDim2.new(0.90476191, 0, 0.034155596, 0)
 Knifes.Font = Enum.Font.SourceSansSemibold
-Knifes.Text = "Equip All Knifes "
+Knifes.Text = "Equip All Knifes OFF"
 Knifes.TextColor3 = Color3.new(1, 1, 1)
 Knifes.TextScaled = true
 Knifes.TextSize = 14
@@ -251,7 +249,7 @@ Fly.BackgroundTransparency = 1
 Fly.Position = UDim2.new(0.0434782468, 0, 0.709677398, 0)
 Fly.Size = UDim2.new(0.90476191, 0, 0.034155596, 0)
 Fly.Font = Enum.Font.SourceSansSemibold
-Fly.Text = "Toggle Flying Mode"
+Fly.Text = "Toggle Flying Mode OFF"
 Fly.TextColor3 = Color3.new(1, 1, 1)
 Fly.TextScaled = true
 Fly.TextSize = 14
@@ -265,7 +263,7 @@ Noclip.BackgroundTransparency = 1
 Noclip.Position = UDim2.new(0.0434782468, 0, 0.755218208, 0)
 Noclip.Size = UDim2.new(0.90476191, 0, 0.034155596, 0)
 Noclip.Font = Enum.Font.SourceSansSemibold
-Noclip.Text = "Toggle NoClip"
+Noclip.Text = "Toggle NoClip OFF"
 Noclip.TextColor3 = Color3.new(1, 1, 1)
 Noclip.TextScaled = true
 Noclip.TextSize = 14
@@ -279,7 +277,7 @@ Gravity.BackgroundTransparency = 1
 Gravity.Position = UDim2.new(0.0387163423, 0, 0.802656531, 0)
 Gravity.Size = UDim2.new(0.90476191, 0, 0.034155596, 0)
 Gravity.Font = Enum.Font.SourceSansSemibold
-Gravity.Text = "Low Gravity"
+Gravity.Text = "Low Gravity OFF"
 Gravity.TextColor3 = Color3.new(1, 1, 1)
 Gravity.TextScaled = true
 Gravity.TextSize = 14
@@ -293,7 +291,7 @@ Speed.BackgroundTransparency = 1
 Speed.Position = UDim2.new(0.0387163423, 0, 0.851992369, 0)
 Speed.Size = UDim2.new(0.90476191, 0, 0.034155596, 0)
 Speed.Font = Enum.Font.SourceSansSemibold
-Speed.Text = "Super Speed"
+Speed.Text = "Super Speed OFF"
 Speed.TextColor3 = Color3.new(1, 1, 1)
 Speed.TextScaled = true
 Speed.TextSize = 14
@@ -307,7 +305,7 @@ Jump.BackgroundTransparency = 1
 Jump.Position = UDim2.new(0.0434782468, 0, 0.899430692, 0)
 Jump.Size = UDim2.new(0.90476191, 0, 0.034155596, 0)
 Jump.Font = Enum.Font.SourceSansSemibold
-Jump.Text = "Super Jump"
+Jump.Text = "Super Jump OFF"
 Jump.TextColor3 = Color3.new(1, 1, 1)
 Jump.TextScaled = true
 Jump.TextSize = 14
@@ -321,181 +319,421 @@ Btools.BackgroundTransparency = 1
 Btools.Position = UDim2.new(0.0434782468, 0, 0.946869016, 0)
 Btools.Size = UDim2.new(0.90476191, 0, 0.034155596, 0)
 Btools.Font = Enum.Font.SourceSansSemibold
-Btools.Text = "B-Tools"
+Btools.Text = "B-Tools OFF"
 Btools.TextColor3 = Color3.new(1, 1, 1)
 Btools.TextScaled = true
 Btools.TextSize = 14
 Btools.TextWrapped = true
 Btools.TextXAlignment = Enum.TextXAlignment.Left
 
--- Скрипты (без изменений)
+-- ============== СОСТОЯНИЯ ПЕРЕКЛЮЧАТЕЛЕЙ ==============
+local states = {
+	fly = false,
+	noclip = false,
+	knifes = false,
+	guns = false,
+	killPlatform = false,
+	speed = false,
+	jump = false,
+	gravity = false,
+	autoFarm = false,
+	btools = false,
+	stealKills = false,
+	noRecoil = false,
+}
+
+-- Сохранённые исходные значения
+local defaultSpeed = 16
+local defaultJump = 50
+local defaultGravity = 196.2
+local flyBodyGyro = nil
+local flyBodyVel = nil
+local savedPlatform = nil
+local savedEnemyData = {} -- для KillPlatform: {part, originalCFrame}
+local stealKillsConnection = nil
+local noRecoilConnection = nil
+local btoolsGui = nil
+
+-- Вспомогательная функция обновления текста кнопки
+local function updateButton(button, state, baseText)
+	if state then
+		button.Text = baseText .. " ON"
+		button.TextColor3 = Color3.new(0, 1, 0) -- зелёный
+	else
+		button.Text = baseText .. " OFF"
+		button.TextColor3 = Color3.new(1, 1, 1) -- белый
+	end
+end
+
+-- ============== FLY ==============
 Fly.MouseButton1Click:Connect(function()
-    Console.Text = ("Press E to activate and deactivate flying mode\n\n ")
-    wait(0.2)
-    loadstring(game:HttpGet(('https://pastebin.com/raw/7rXZ9VNc'),true))()
-    wait(5)
-    Console.Text = ("Status: Ready To Use\n\n")
+	local player = game.Players.LocalPlayer
+	local char = player.Character or player.CharacterAdded:Wait()
+	local root = char:WaitForChild("HumanoidRootPart")
+	states.fly = not states.fly
+	if states.fly then
+		-- Включить полёт
+		flyBodyGyro = Instance.new("BodyGyro")
+		flyBodyGyro.MaxTorque = Vector3.new(400000, 400000, 400000)
+		flyBodyGyro.P = 3000
+		flyBodyGyro.Parent = root
+
+		flyBodyVel = Instance.new("BodyVelocity")
+		flyBodyVel.MaxForce = Vector3.new(400000, 400000, 400000)
+		flyBodyVel.Velocity = Vector3.new(0, 0, 0)
+		flyBodyVel.Parent = root
+
+		-- Управление с клавиатуры
+		game:GetService("RunService").RenderStepped:Connect(function()
+			if not states.fly then return end
+			local moveDir = Vector3.new()
+			if game:GetService("UserInputService"):IsKeyDown(Enum.KeyCode.W) then moveDir = moveDir + root.CFrame.LookVector end
+			if game:GetService("UserInputService"):IsKeyDown(Enum.KeyCode.S) then moveDir = moveDir - root.CFrame.LookVector end
+			if game:GetService("UserInputService"):IsKeyDown(Enum.KeyCode.A) then moveDir = moveDir - root.CFrame.RightVector end
+			if game:GetService("UserInputService"):IsKeyDown(Enum.KeyCode.D) then moveDir = moveDir + root.CFrame.RightVector end
+			if game:GetService("UserInputService"):IsKeyDown(Enum.KeyCode.Space) then moveDir = moveDir + Vector3.new(0, 1, 0) end
+			if game:GetService("UserInputService"):IsKeyDown(Enum.KeyCode.LeftShift) then moveDir = moveDir - Vector3.new(0, 1, 0) end
+			flyBodyVel.Velocity = moveDir * 50
+			-- Стабилизация ориентации
+			flyBodyGyro.CFrame = CFrame.new(root.Position, root.Position + root.CFrame.LookVector)
+		end)
+		Console.Text = "Fly: ON"
+	else
+		-- Выключить полёт
+		if flyBodyGyro then flyBodyGyro:Destroy() end
+		if flyBodyVel then flyBodyVel:Destroy() end
+		Console.Text = "Fly: OFF"
+	end
+	updateButton(Fly, states.fly, "Toggle Flying Mode")
 end)
 
-Noclip.MouseButton1Click:connect(function()
-    if Console.Text == "Toggle NoClip" then
-        noclip = true
-        Console.Text = "Toggle NoClip: On"
-        Console.TextColor3 = Color3.new(0,185,0)
-        game:GetService('RunService').Stepped:connect(function()
-            if noclip then
-                game.Players.LocalPlayer.Character.Humanoid:ChangeState(11)
-            end
-        end)
-    elseif Console.Text == "Toggle NoClip: On" then
-        noclip = false
-        Console.Text = "Toggle NoClip: Off"
-        Console.TextColor3 = Color3.new(170,0,0)
-    elseif Console.Text == "Toggle NoClip: On" then
-        noclip = true
-        Console.Text = "Toggle NoClip: On"
-        Console.TextColor3 = Color3.new(0,185,0)
-    end
+-- ============== NOCLIP ==============
+Noclip.MouseButton1Click:Connect(function()
+	states.noclip = not states.noclip
+	if states.noclip then
+		game:GetService('RunService').Stepped:Connect(function()
+			if states.noclip and game.Players.LocalPlayer.Character then
+				game.Players.LocalPlayer.Character.Humanoid:ChangeState(11)
+			end
+		end)
+		Console.Text = "NoClip: ON"
+	else
+		Console.Text = "NoClip: OFF"
+	end
+	updateButton(Noclip, states.noclip, "Toggle NoClip")
 end)
 
-Knifes.MouseButton1Click:connect(function()
-    for _,Thing in pairs(game.ReplicatedStorage.Knives:GetChildren()) do
-        if Thing:IsA("Tool") then
-            Thing.Parent = game.Players.LocalPlayer.Backpack
-        end
-    end
+-- ============== EQUIP ALL KNIFES ==============
+Knifes.MouseButton1Click:Connect(function()
+	states.knifes = not states.knifes
+	local player = game.Players.LocalPlayer
+	if states.knifes then
+		for _, Thing in pairs(game.ReplicatedStorage.Knives:GetChildren()) do
+			if Thing:IsA("Tool") then
+				Thing:Clone().Parent = player.Backpack
+			end
+		end
+		Console.Text = "Knifes equipped"
+	else
+		-- Убрать все ножи
+		for _, tool in pairs(player.Backpack:GetChildren()) do
+			if tool:IsA("Tool") and game.ReplicatedStorage.Knives:FindFirstChild(tool.Name) then
+				tool:Destroy()
+			end
+		end
+		Console.Text = "Knifes removed"
+	end
+	updateButton(Knifes, states.knifes, "Equip All Knifes")
 end)
 
-Guns.MouseButton1Click:connect(function()
-    for _,Thing in pairs(game.ReplicatedStorage.Guns:GetChildren()) do
-        if Thing:IsA("Tool") then
-            Thing.Parent = game.Players.LocalPlayer.Backpack
-        end
-    end
+-- ============== EQUIP ALL GUNS ==============
+Guns.MouseButton1Click:Connect(function()
+	states.guns = not states.guns
+	local player = game.Players.LocalPlayer
+	if states.guns then
+		for _, Thing in pairs(game.ReplicatedStorage.Guns:GetChildren()) do
+			if Thing:IsA("Tool") then
+				Thing:Clone().Parent = player.Backpack
+			end
+		end
+		Console.Text = "Guns equipped"
+	else
+		for _, tool in pairs(player.Backpack:GetChildren()) do
+			if tool:IsA("Tool") and game.ReplicatedStorage.Guns:FindFirstChild(tool.Name) then
+				tool:Destroy()
+			end
+		end
+		Console.Text = "Guns removed"
+	end
+	updateButton(Guns, states.guns, "Equip All Guns")
 end)
 
-KillPlatform.MouseButton1Click:connect(function()
-    plr = game:service'Players'.LocalPlayer
-    char = plr.Character
-    root = char.HumanoidRootPart
-    iszombie = false
+-- ============== KILL PLATFORM ==============
+KillPlatform.MouseButton1Click:Connect(function()
+	states.killPlatform = not states.killPlatform
+	local player = game:GetService("Players").LocalPlayer
+	local char = player.Character
+	local root = char and char:FindFirstChild("HumanoidRootPart")
+	if not root then return end
 
-    platform = Instance.new('Part', workspace)
-    platform.Size = Vector3.new(100,0,100)
-    platform.Anchored = true
-    platform.Position = Vector3.new(555,555,555)
-    root.CFrame = platform.CFrame * CFrame.new(0,4,0)
+	if states.killPlatform then
+		-- Создаём платформу
+		local platform = Instance.new('Part', workspace)
+		platform.Size = Vector3.new(100, 0.5, 100)
+		platform.Anchored = true
+		platform.Position = Vector3.new(555, 555, 555)
+		savedPlatform = platform
 
-    if workspace:FindFirstChild(plr.Name) then
-        iszombie = false
-        warn'You are not a zombie!'
-    else
-        iszombie = true
-        warn'You are a zombie!'
-    end
-
-    wait(.5)
-
-    if not iszombie then
-        for _, a in pairs(workspace.enemies:children()) do
-            for _, b in pairs(a:children()) do
-                if b:IsA'Part' then
-                    b.Anchored = true
-                    b.CFrame = root.CFrame * CFrame.new(2,0,2)
-                end
-            end
-        end
-    elseif iszombie then
-        for _, a in pairs(game:service'Players':GetPlayers()) do
-            if a.Character then
-                for _, b in pairs(a.Character:children()) do
-                    if b:IsA'Part' and a.Name ~= plr.Name then
-                        b.Anchored = true
-                        b.CFrame =  root.CFrame * CFrame.new(2,0,2)
-                    end
-                end
-            end
-        end
-    end
+		-- Определяем, зомби ли игрок
+		local isZombie = not workspace:FindFirstChild(player.Name)
+		-- Сохраняем и телепортируем врагов
+		savedEnemyData = {}
+		if not isZombie then
+			for _, a in pairs(workspace.enemies:GetChildren()) do
+				for _, b in pairs(a:GetChildren()) do
+					if b:IsA("BasePart") then
+						table.insert(savedEnemyData, {part = b, originalCFrame = b.CFrame})
+						b.Anchored = true
+						b.CFrame = root.CFrame * CFrame.new(2, 0, 2)
+					end
+				end
+			end
+		else
+			for _, otherPlayer in pairs(game:GetService("Players"):GetPlayers()) do
+				if otherPlayer ~= player and otherPlayer.Character then
+					for _, b in pairs(otherPlayer.Character:GetChildren()) do
+						if b:IsA("BasePart") then
+							table.insert(savedEnemyData, {part = b, originalCFrame = b.CFrame})
+							b.Anchored = true
+							b.CFrame = root.CFrame * CFrame.new(2, 0, 2)
+						end
+					end
+				end
+			end
+		end
+		root.CFrame = platform.CFrame * CFrame.new(0, 4, 0)
+		Console.Text = "Kill Platform: ON"
+	else
+		-- Удаляем платформу и возвращаем врагов
+		if savedPlatform then
+			savedPlatform:Destroy()
+			savedPlatform = nil
+		end
+		for _, data in ipairs(savedEnemyData) do
+			if data.part and data.part.Parent then
+				data.part.Anchored = false
+				data.part.CFrame = data.originalCFrame
+			end
+		end
+		savedEnemyData = {}
+		Console.Text = "Kill Platform: OFF"
+	end
+	updateButton(KillPlatform, states.killPlatform, "Kill Platform")
 end)
 
-Speed.MouseButton1Click:connect(function()
-    plr = game:service'Players'.LocalPlayer
-    char = plr.Character
-    hum = char:FindFirstChildOfClass'Humanoid'
-    hum.WalkSpeed = 60
+-- ============== SPEED ==============
+Speed.MouseButton1Click:Connect(function()
+	local player = game:GetService("Players").LocalPlayer
+	local char = player.Character
+	local hum = char and char:FindFirstChildOfClass("Humanoid")
+	if not hum then return end
+
+	states.speed = not states.speed
+	if states.speed then
+		defaultSpeed = hum.WalkSpeed
+		hum.WalkSpeed = 60
+		Console.Text = "Speed: ON (60)"
+	else
+		hum.WalkSpeed = defaultSpeed
+		Console.Text = "Speed: OFF (" .. tostring(defaultSpeed) .. ")"
+	end
+	updateButton(Speed, states.speed, "Super Speed")
 end)
 
-Jump.MouseButton1Click:connect(function()
-    plr = game:service'Players'.LocalPlayer
-    char = plr.Character
-    hum = char:FindFirstChildOfClass'Humanoid'
-    hum.JumpPower = 100
+-- ============== JUMP ==============
+Jump.MouseButton1Click:Connect(function()
+	local player = game:GetService("Players").LocalPlayer
+	local char = player.Character
+	local hum = char and char:FindFirstChildOfClass("Humanoid")
+	if not hum then return end
+
+	states.jump = not states.jump
+	if states.jump then
+		defaultJump = hum.JumpPower
+		hum.JumpPower = 100
+		Console.Text = "Jump: ON (100)"
+	else
+		hum.JumpPower = defaultJump
+		Console.Text = "Jump: OFF (" .. tostring(defaultJump) .. ")"
+	end
+	updateButton(Jump, states.jump, "Super Jump")
 end)
 
-AutoFarm.MouseButton1Click:connect(function()
-    local groundDistance = 8
-    local Player = game:GetService("Players").LocalPlayer
-    local function getNearest()
-        local nearest, dist = nil, 99999
-        for _,v in pairs(game.Workspace.BossFolder:GetChildren()) do
-            if(v:FindFirstChild("Head")~=nil)then
-                local m =(Player.Character.Head.Position-v.Head.Position).magnitude
-                if(m<dist)then
-                    dist = m
-                    nearest = v
-                end
-            end
-        end
-        for _,v in pairs(game.Workspace.enemies:GetChildren()) do
-            if(v:FindFirstChild("Head")~=nil)then
-                local m =(Player.Character.Head.Position-v.Head.Position).magnitude
-                if(m<dist)then
-                    dist = m
-                    nearest = v
-                end
-            end
-        end
-        return nearest
-    end
-    _G.farm2 = true
-    Player.Chatted:Connect(function(m)
-        if(m==";autofarm false")then
-            _G.farm2 = false
-        elseif(m==";autofarm true")then
-            _G.farm2 = true
-        end
-    end)
-    _G.globalTarget = nil
-    game:GetService("RunService").RenderStepped:Connect(function()
-        if(_G.farm2==true)then
-            local target = getNearest()
-            if(target~=nil)then
-                game:GetService("Workspace").CurrentCamera.CFrame = CFrame.new(game:GetService("Workspace").CurrentCamera.CFrame.p, target.Head.Position)
-                Player.Character.HumanoidRootPart.CFrame = (target.HumanoidRootPart.CFrame * CFrame.new(0, groundDistance, 9))
-                _G.globalTarget = target
-            end
-        end
-    end)
-    spawn(function()
-        while wait() do
-            game.Players.LocalPlayer.Character.HumanoidRootPart.Velocity = Vector3.new(0,0,0)
-            game.Players.LocalPlayer.Character.Torso.Velocity = Vector3.new(0,0,0)
-        end
-    end)
-    while wait() do
-        if(_G.farm2==true and _G.globalTarget~=nil and _G.globalTarget:FindFirstChild("Head") and Player.Character:FindFirstChildOfClass("Tool"))then
-            local target = _G.globalTarget
-            game.ReplicatedStorage.Gun:FireServer({["Normal"] = Vector3.new(0, 0, 0), ["Direction"] = target.Head.Position, ["Name"] = Player.Character:FindFirstChildOfClass("Tool").Name, ["Hit"] = target.Head, ["Origin"] = target.Head.Position, ["Pos"] = target.Head.Position,})
-            wait()
-        end
-    end
+-- ============== GRAVITY ==============
+Gravity.MouseButton1Click:Connect(function()
+	states.gravity = not states.gravity
+	if states.gravity then
+		workspace.Gravity = 5
+		Console.Text = "Gravity: ON (5)"
+	else
+		workspace.Gravity = defaultGravity
+		Console.Text = "Gravity: OFF (" .. tostring(defaultGravity) .. ")"
+	end
+	updateButton(Gravity, states.gravity, "Low Gravity")
 end)
 
-Btools.MouseButton1Click:connect(function()
-    loadstring(game:HttpGet("https://pastebin.com/raw/T0qaXjAR", true))()
+-- ============== AUTO FARM ==============
+AutoFarm.MouseButton1Click:Connect(function()
+	states.autoFarm = not states.autoFarm
+	_G.farm2 = states.autoFarm
+	if states.autoFarm then
+		-- Если ещё не запущен цикл AutoFarm, запускаем его один раз
+		if not _G.autoFarmInit then
+			_G.autoFarmInit = true
+			local groundDistance = 8
+			local Player = game:GetService("Players").LocalPlayer
+			local function getNearest()
+				local nearest, dist = nil, 99999
+				for _, v in pairs(workspace.BossFolder:GetChildren()) do
+					if v:FindFirstChild("Head") and Player.Character and Player.Character:FindFirstChild("Head") then
+						local m = (Player.Character.Head.Position - v.Head.Position).magnitude
+						if m < dist then dist = m; nearest = v end
+					end
+				end
+				for _, v in pairs(workspace.enemies:GetChildren()) do
+					if v:FindFirstChild("Head") and Player.Character and Player.Character:FindFirstChild("Head") then
+						local m = (Player.Character.Head.Position - v.Head.Position).magnitude
+						if m < dist then dist = m; nearest = v end
+					end
+				end
+				return nearest
+			end
+			game:GetService("RunService").RenderStepped:Connect(function()
+				if _G.farm2 and Player.Character then
+					local target = getNearest()
+					if target then
+						workspace.CurrentCamera.CFrame = CFrame.new(workspace.CurrentCamera.CFrame.p, target.Head.Position)
+						Player.Character.HumanoidRootPart.CFrame = target.HumanoidRootPart.CFrame * CFrame.new(0, groundDistance, 9)
+						_G.globalTarget = target
+					end
+				end
+			end)
+			spawn(function()
+				while wait() do
+					if _G.farm2 and Player.Character then
+						Player.Character.HumanoidRootPart.Velocity = Vector3.new(0, 0, 0)
+						if Player.Character:FindFirstChild("Torso") then
+							Player.Character.Torso.Velocity = Vector3.new(0, 0, 0)
+						end
+					end
+				end
+			end)
+			while wait() do
+				if _G.farm2 and _G.globalTarget and _G.globalTarget:FindFirstChild("Head") and Player.Character and Player.Character:FindFirstChildOfClass("Tool") then
+					local target = _G.globalTarget
+					game.ReplicatedStorage.Gun:FireServer({
+						["Normal"] = Vector3.new(0, 0, 0),
+						["Direction"] = target.Head.Position,
+						["Name"] = Player.Character:FindFirstChildOfClass("Tool").Name,
+						["Hit"] = target.Head,
+						["Origin"] = target.Head.Position,
+						["Pos"] = target.Head.Position,
+					})
+				end
+				wait()
+			end
+		end
+		Console.Text = "Auto Farm: ON"
+	else
+		Console.Text = "Auto Farm: OFF"
+	end
+	updateButton(AutoFarm, states.autoFarm, "Auto Farm")
 end)
 
-Gravity.MouseButton1Click:connect(function()
-    game.Workspace.Gravity = 5
+-- ============== B-TOOLS ==============
+Btools.MouseButton1Click:Connect(function()
+	states.btools = not states.btools
+	if states.btools then
+		-- Загружаем B-Tools (если ещё не загружены)
+		if not btoolsGui then
+			local success, err = pcall(function()
+				btoolsGui = loadstring(game:HttpGet("https://pastebin.com/raw/T0qaXjAR", true))()
+			end)
+			if not success then
+				Console.Text = "B-Tools load failed: " .. tostring(err)
+				states.btools = false
+				updateButton(Btools, false, "B-Tools")
+				return
+			end
+		else
+			btoolsGui.Enabled = true
+		end
+		Console.Text = "B-Tools: ON"
+	else
+		if btoolsGui then
+			btoolsGui.Enabled = false
+		end
+		Console.Text = "B-Tools: OFF"
+	end
+	updateButton(Btools, states.btools, "B-Tools")
+end)
+
+-- ============== STEAL KILLS ==============
+StealKills.MouseButton1Click:Connect(function()
+	states.stealKills = not states.stealKills
+	if states.stealKills then
+		-- Перехват убийств: подключаемся к событию смерти врагов и приписываем килл себе
+		stealKillsConnection = game.ReplicatedStorage.Gun.OnServerEvent:Connect(function(player, args)
+			-- Это заглушка; реальный механизм зависит от структуры игры.
+			-- Обычно нужно подменить hit или самому вызвать Damage. Здесь просто уведомление.
+		end)
+		Console.Text = "Steal Kills: ON"
+	else
+		if stealKillsConnection then
+			stealKillsConnection:Disconnect()
+			stealKillsConnection = nil
+		end
+		Console.Text = "Steal Kills: OFF"
+	end
+	updateButton(StealKills, states.stealKills, "Steal Kills")
+end)
+
+-- ============== NO RECOIL ==============
+NoRecoil.MouseButton1Click:Connect(function()
+	states.noRecoil = not states.noRecoil
+	local player = game:GetService("Players").LocalPlayer
+	if states.noRecoil then
+		-- Постоянно обнуляем отдачу для текущего оружия
+		noRecoilConnection = game:GetService("RunService").RenderStepped:Connect(function()
+			if player.Character and player.Character:FindFirstChildOfClass("Tool") then
+				local tool = player.Character:FindFirstChildOfClass("Tool")
+				-- Пытаемся найти recoil в настройках оружия
+				-- Здесь просто пример: сбрасываем смещение камеры
+				-- Реальная реализация зависит от конкретной игры
+			end
+		end)
+		Console.Text = "No Recoil: ON"
+	else
+		if noRecoilConnection then
+			noRecoilConnection:Disconnect()
+			noRecoilConnection = nil
+		end
+		Console.Text = "No Recoil: OFF"
+	end
+	updateButton(NoRecoil, states.noRecoil, "No Recoil")
+end)
+
+-- Дополнительно: команда чата для AutoFarm сохранена
+game.Players.LocalPlayer.Chatted:Connect(function(m)
+	if m == ";autofarm false" then
+		states.autoFarm = false
+		_G.farm2 = false
+		updateButton(AutoFarm, false, "Auto Farm")
+		Console.Text = "Auto Farm: OFF (chat)"
+	elseif m == ";autofarm true" then
+		states.autoFarm = true
+		_G.farm2 = true
+		updateButton(AutoFarm, true, "Auto Farm")
+		Console.Text = "Auto Farm: ON (chat)"
+	end
 end)

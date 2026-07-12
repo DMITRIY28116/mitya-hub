@@ -1,252 +1,95 @@
--- Fox Ultimate Combo (Exact User Logic Merge)
+-- Slap Royale Static Reach + 360 Aura + ESP (Stable, No Crash)
 if not game:IsLoaded() then game.Loaded:Wait() end
 task.wait(2)
 
-local Players = game:GetService("Players")
-local RunService = game:GetService("RunService")
-local UserInputService = game:GetService("UserInputService")
-local VirtualUser = game:GetService("VirtualUser")
-local Workspace = game:GetService("Workspace")
+local success, err = pcall(function()
+    local Players = game:GetService("Players")
+    local RunService = game:GetService("RunService")
+    local UserInputService = game:GetService("UserInputService")
+    local VirtualUser = game:GetService("VirtualUser")
 
-local LocalPlayer = Players.LocalPlayer
+    local LocalPlayer = Players.LocalPlayer
+    local ReachActive = false
+    local AuraActive = false
+    local EspActive = false
+    local ReachDistance = 15 
 
--- ========================================================
--- СКРИПТ 1: GHOST FARMER ПЕРЕМЕННЫЕ
--- ========================================================
-local AutoCollectActive = false
-local AutoBuffActive = false
-local AutoBombActive = false
-local FlySpeed = 800 
-local StopDistance = 20 
-local GrabbedCount = 0
-local MaxGrabsBeforePause = 3
-local PauseTime = 4
+    -- GUI
+    local Gui = Instance.new("ScreenGui")
+    Gui.Name = "FoxSlapStable"
+    Gui.ResetOnSpawn = false
+    Gui.Parent = LocalPlayer:WaitForChild("PlayerGui")
 
--- ========================================================
--- СКРИПТ 2: AURA/REACH ПЕРЕМЕННЫЕ
--- ========================================================
-local ReachActive = false
-local AuraActive = false
-local PlayerEspActive = false
-local ReachDistance = 15 
+    local Frame = Instance.new("Frame")
+    Frame.Size = UDim2.new(0, 250, 0, 180)
+    Frame.Position = UDim2.new(0, 15, 0.3, 0)
+    Frame.BackgroundColor3 = Color3.fromRGB(18, 18, 25)
+    Frame.Parent = Gui
+    Instance.new("UICorner", Frame).CornerRadius = UDim.new(0, 8)
 
--- ========================================================
--- СКРИПТ 3: ITEM ESP ПЕРЕМЕННЫЕ
--- ========================================================
-local ItemEspActive = false
-local SELECTIONBOX_NAME = "Exec_SelectionBox"
-local BILLBOARD_NAME = "Exec_Billboard"
-local TEXT_SIZE = 18
-local GOLD_COLOR = Color3.fromRGB(255, 200, 0)
-local DEFAULT_TEXT_COLOR = Color3.fromRGB(255, 255, 255)
-local prioritized = {
-    ["bull's essence"] = true,
-    ["true power"] = true,
-    ["potion of strength"] = true,
-    ["boba"] = true,
-}
-local itemVisuals = {}
-local itemEspConns = {}
-
--- ========================================================
--- СКРИПТ 1: GHOST FARMER ЛОГИКА
--- ========================================================
-local noclipConn = nil
-local function StartNoclip()
-    if noclipConn then return end
-    noclipConn = RunService.Stepped:Connect(function()
-        pcall(function()
-            local char = LocalPlayer.Character
-            if char then
-                for _, part in ipairs(char:GetDescendants()) do
-                    if part:IsA("BasePart") then part.CanCollide = false end
-                end
-            end
-        end)
-    end)
-end
-
-local function StopNoclip()
-    if noclipConn then
-        noclipConn:Disconnect()
-        noclipConn = nil
-        pcall(function()
-            local char = LocalPlayer.Character
-            if char then
-                for _, part in ipairs(char:GetDescendants()) do
-                    if part:IsA("BasePart") then part.CanCollide = true end
-                end
-            end
-        end)
-    end
-end
-
-local function FindNearestItem()
-    local nearest = nil
-    local minDist = math.huge
-    
-    pcall(function()
-        local char = LocalPlayer.Character
-        if not char or not char:FindFirstChild("HumanoidRootPart") then return end
-        local myPos = char.HumanoidRootPart.Position
-        
-        for _, obj in ipairs(workspace:GetDescendants()) do
-            if obj:IsA("Tool") then
-                local isHeld = false
-                if obj.Parent and obj.Parent:IsA("Model") and obj.Parent:FindFirstChild("Humanoid") then
-                    isHeld = true
-                end
-                
-                if not isHeld then
-                    local handle = obj:FindFirstChild("Handle")
-                    if handle then
-                        local dist = (myPos - handle.Position).Magnitude
-                        if dist < minDist then
-                            minDist = dist
-                            nearest = obj
-                        end
-                    end
-                end
-            end
+    -- Драг
+    local Dragging, DragStart, StartPos
+    Frame.InputBegan:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 then
+            Dragging = true; DragStart = input.Position; StartPos = Frame.Position
         end
     end)
-    
-    return nearest
-end
+    Frame.InputEnded:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 then Dragging = false end
+    end)
+    UserInputService.InputChanged:Connect(function(input)
+        if Dragging and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
+            local Delta = input.Position - DragStart
+            Frame.Position = UDim2.new(StartPos.X.Scale, StartPos.X.Offset + Delta.X, StartPos.Y.Scale, StartPos.Y.Offset + Delta.Y)
+        end
+    end)
 
-local function FastCollectLoop()
-    StartNoclip()
-    
-    while AutoCollectActive do
-        task.wait(0.5)
-        pcall(function()
-            if GrabbedCount >= MaxGrabsBeforePause then
-                Status.Text = "Отдых... (" .. PauseTime .. " сек)"
-                Status.TextColor3 = Color3.fromRGB(255, 200, 0)
-                task.wait(PauseTime)
-                GrabbedCount = 0
-            end
-            
-            local char = LocalPlayer.Character
-            if not char or not char:FindFirstChild("HumanoidRootPart") or not char:FindFirstChild("Humanoid") then return end
-            local root = char.HumanoidRootPart
-            local hum = char.Humanoid
-            
-            local item = FindNearestItem()
-            if item then
-                local handle = item:FindFirstChild("Handle")
-                if handle then
-                    local dist = (root.Position - handle.Position).Magnitude
-                    
-                    if dist > StopDistance then
-                        Status.Text = "Летим..."
-                        hum.PlatformStand = true
-                        
-                        local direction = (handle.Position - root.Position).Unit
-                        local flyTarget = handle.Position - (direction * StopDistance) + Vector3.new(0, 5, 0)
-                        
-                        root.AssemblyLinearVelocity = direction * FlySpeed
-                        
-                        local timeout = 0
-                        while (root.Position - flyTarget).Magnitude > 5 do
-                            local dt = RunService.Heartbeat:Wait()
-                            timeout = timeout + dt
-                            if timeout > 5 then break end
-                            if not AutoCollectActive then break end
-                            local newDir = (flyTarget - root.Position).Unit
-                            root.AssemblyLinearVelocity = newDir * FlySpeed
-                        end
-                        
-                        root.AssemblyLinearVelocity = Vector3.new(0, 0, 0)
-                        root.Velocity = Vector3.new(0, 0, 0)
-                        hum.PlatformStand = false 
-                        
-                        Status.Text = "Синхронизация..."
-                        Status.TextColor3 = Color3.fromRGB(255, 100, 0)
-                        task.wait(1.5)
-                    end
-                    
-                    Status.Text = "Идем к предмету..."
-                    Status.TextColor3 = Color3.fromRGB(0, 255, 120)
-                    hum:MoveTo(handle.Position)
-                    
-                    local walkTimeout = 0
-                    while (root.Position - handle.Position).Magnitude > 5 and walkTimeout < 3 do
-                        task.wait(0.1)
-                        walkTimeout = walkTimeout + 0.1
-                        if not AutoCollectActive then break end
-                    end
-                    
-                    task.wait(0.2)
-                    
-                    Status.Text = "Берем!"
-                    local prompt = item:FindFirstChild("ProximityPrompt", true)
-                    if prompt then
-                        pcall(function() fireproximityprompt(prompt) end)
-                    else
-                        pcall(function() keypress(0x46) task.wait(0.05) keyrelease(0x46) end)
-                    end
-                    
-                    GrabbedCount = GrabbedCount + 1
-                    Status.Text = "Взято: " .. GrabbedCount .. "/" .. MaxGrabsBeforePause
-                    
-                    task.wait(0.5)
-                end
-            end
-        end)
-    end
-    
-    Status.Text = "Статус: Готов"
-    Status.TextColor3 = Color3.fromRGB(200, 200, 200)
-    GrabbedCount = 0
-    StopNoclip()
-end
+    local Title = Instance.new("TextLabel")
+    Title.Size = UDim2.new(1, 0, 0, 25)
+    Title.BackgroundTransparency = 1
+    Title.Text = "SLAP FOX MOD"
+    Title.TextColor3 = Color3.fromRGB(0, 255, 120)
+    Title.TextScaled = true
+    Title.Font = Enum.Font.GothamBold
+    Title.Parent = Frame
 
-local function AutoUseLoop()
-    while task.wait(1.5) do
-        pcall(function()
-            local char = LocalPlayer.Character
-            if not char or not char:FindFirstChild("Humanoid") then return end
-            local hum = char.Humanoid
-            local backpack = LocalPlayer.Backpack
-            
-            for _, tool in ipairs(backpack:GetChildren()) do
-                if tool:IsA("Tool") then
-                    local name = tool.Name:lower()
-                    local isBomb = name:find("bomb") or name:find("tnt") or name:find("dynamite") or name:find("grenade") or name:find("explode") or name:find("c4")
-                    
-                    if AutoBuffActive and not isBomb then
-                        hum:EquipTool(tool)
-                        task.wait(0.1)
-                        tool:Activate()
-                        task.wait(0.3)
-                        hum:UnequipTools()
-                        task.wait(0.05)
-                    end
-                    
-                    if AutoBombActive and isBomb then
-                        hum:EquipTool(tool)
-                        task.wait(0.1)
-                        tool:Activate()
-                        task.wait(0.3)
-                        hum:UnequipTools()
-                        task.wait(0.05)
-                    end
-                end
-            end
-        end)
-    end
-end
+    local ReachBtn = Instance.new("TextButton")
+    ReachBtn.Size = UDim2.new(0.9, 0, 0, 30)
+    ReachBtn.Position = UDim2.new(0.05, 0, 0, 30)
+    ReachBtn.BackgroundColor3 = Color3.fromRGB(30, 30, 45)
+    ReachBtn.Text = "REACH (15st): OFF"
+    ReachBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+    ReachBtn.TextScaled = true
+    ReachBtn.Font = Enum.Font.GothamSemibold
+    ReachBtn.Parent = Frame
+    Instance.new("UICorner", ReachBtn).CornerRadius = UDim.new(0, 6)
 
-task.spawn(AutoUseLoop)
+    local AuraBtn = Instance.new("TextButton")
+    AuraBtn.Size = UDim2.new(0.9, 0, 0, 30)
+    AuraBtn.Position = UDim2.new(0.05, 0, 0, 68)
+    AuraBtn.BackgroundColor3 = Color3.fromRGB(30, 30, 45)
+    AuraBtn.Text = "KILL AURA: OFF"
+    AuraBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+    AuraBtn.TextScaled = true
+    AuraBtn.Font = Enum.Font.GothamSemibold
+    AuraBtn.Parent = Frame
+    Instance.new("UICorner", AuraBtn).CornerRadius = UDim.new(0, 6)
 
--- ========================================================
--- СКРИПТ 2: AURA/REACH/PLAYER ESP ЛОГИКА
--- ========================================================
-local OriginalGripC0 = nil
+    local EspBtn = Instance.new("TextButton")
+    EspBtn.Size = UDim2.new(0.9, 0, 0, 30)
+    EspBtn.Position = UDim2.new(0.05, 0, 0, 106)
+    EspBtn.BackgroundColor3 = Color3.fromRGB(30, 30, 45)
+    EspBtn.Text = "PLAYER ESP: OFF"
+    EspBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+    EspBtn.TextScaled = true
+    EspBtn.Font = Enum.Font.GothamSemibold
+    EspBtn.Parent = Frame
+    Instance.new("UICorner", EspBtn).CornerRadius = UDim.new(0, 6)
 
-local function ApplyGrip()
-    pcall(function()
+    -- ===== ЛОГИКА GRIP REACH (СТАТИЧЕСКИЙ) =====
+    local OriginalGripC0 = nil
+
+    local function ApplyGrip()
         local char = LocalPlayer.Character
         if not char then return end
         local arm = char:FindFirstChild("Right Arm") or char:FindFirstChild("RightHand")
@@ -260,355 +103,117 @@ local function ApplyGrip()
                 grip.C0 = OriginalGripC0
             end
         end
-    end)
-end
-
-local function OnCharacterAdded(char)
-    task.wait(1)
-    local arm = char:WaitForChild("Right Arm", 5) or char:WaitForChild("RightHand", 5)
-    if arm then
-        arm.ChildAdded:Connect(function(child)
-            if child.Name == "RightGrip" then
-                task.wait(0.1)
-                OriginalGripC0 = nil
-                ApplyGrip()
-            end
-        end)
     end
-end
 
-if LocalPlayer.Character then OnCharacterAdded(LocalPlayer.Character) end
-LocalPlayer.CharacterAdded:Connect(OnCharacterAdded)
-
-RunService.RenderStepped:Connect(function()
-    if not AuraActive then return end
-    pcall(function()
-        local char = LocalPlayer.Character
-        if not char or not char:FindFirstChild("HumanoidRootPart") then return end
-        local myRoot = char.HumanoidRootPart
-        
-        for _, player in ipairs(Players:GetPlayers()) do
-            if player ~= LocalPlayer and player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
-                local targetRoot = player.Character.HumanoidRootPart
-                local dist = (myRoot.Position - targetRoot.Position).Magnitude
-                
-                if dist <= (ReachDistance + 2) then
-                    VirtualUser:CaptureController()
-                    VirtualUser:ClickButton1(Vector2.new())
-                    break
-                end
-            end
-        end
-    end)
-end)
-
-local function UpdatePlayerEsp()
-    for _, player in ipairs(Players:GetPlayers()) do
-        if player ~= LocalPlayer then
-            pcall(function()
-                if player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
-                    local highlight = player.Character:FindFirstChild("FoxESP")
-                    if PlayerEspActive then
-                        if not highlight then
-                            highlight = Instance.new("Highlight")
-                            highlight.Name = "FoxESP"
-                            highlight.FillColor = Color3.fromRGB(255, 0, 0)
-                            highlight.FillTransparency = 0.5
-                            highlight.OutlineColor = Color3.fromRGB(255, 255, 255)
-                            highlight.OutlineTransparency = 0
-                            highlight.Parent = player.Character
-                        end
-                    else
-                        if highlight then highlight:Destroy() end
-                    end
+    local function OnCharacterAdded(char)
+        task.wait(1)
+        local arm = char:WaitForChild("Right Arm", 5) or char:WaitForChild("RightHand", 5)
+        if arm then
+            arm.ChildAdded:Connect(function(child)
+                if child.Name == "RightGrip" then
+                    task.wait(0.1)
+                    OriginalGripC0 = nil
+                    ApplyGrip()
                 end
             end)
         end
     end
-end
 
-Players.PlayerAdded:Connect(function(player)
-    player.CharacterAdded:Connect(function(char) task.wait(2) UpdatePlayerEsp() end)
-end)
-Players.PlayerRemoving:Connect(function(player)
-    pcall(function()
-        if player.Character and player.Character:FindFirstChild("FoxESP") then player.Character.FoxESP:Destroy() end
-    end)
-end)
-LocalPlayer.CharacterAdded:Connect(function() task.wait(2) UpdatePlayerEsp() end)
+    if LocalPlayer.Character then OnCharacterAdded(LocalPlayer.Character) end
+    LocalPlayer.CharacterAdded:Connect(OnCharacterAdded)
 
-
--- ========================================================
--- СКРИПТ 3: ITEM ESP ЛОГИКА (ОРИГИНАЛЬНАЯ)
--- ========================================================
-local function isBasePart(obj) return obj and obj:IsA("BasePart") end
-
-local function getAttachPartForModel(model)
-    if not model or not model:IsA("Model") then return nil end
-    if model.PrimaryPart and isBasePart(model.PrimaryPart) then return model.PrimaryPart end
-    for _, d in ipairs(model:GetDescendants()) do
-        if isBasePart(d) then return d end
-    end
-    return nil
-end
-
-local function safeNew(className)
-    local ok, inst = pcall(Instance.new, className)
-    if ok then return inst end
-    return nil
-end
-
-local function destroyVisualsForPart(part)
-    local entry = itemVisuals[part]
-    if not entry then return end
-    for _, obj in ipairs(entry) do
-        pcall(function() if obj and obj.Parent then obj:Destroy() end end)
-    end
-    itemVisuals[part] = nil
-end
-
-local function createSelectionBox(part, useGold)
-    local sb = safeNew("SelectionBox")
-    if not sb then return nil end
-    sb.Name = SELECTIONBOX_NAME
-    pcall(function() sb.Adornee = part end)
-    sb.LineThickness = 0.06
-    sb.SurfaceTransparency = 1
-    sb.Color3 = useGold and GOLD_COLOR or Color3.fromRGB(255, 170, 0)
-    local ok, err = pcall(function() sb.Parent = Workspace end)
-    if not ok then
-        pcall(function() sb:Destroy() end)
-        return nil
-    end
-    return sb
-end
-
-local function createBillboard(part, labelText, useGold)
-    local bg = safeNew("BillboardGui")
-    if not bg then return nil end
-    bg.Name = BILLBOARD_NAME
-    pcall(function() bg.Adornee = part end)
-    bg.AlwaysOnTop = true
-    bg.Size = UDim2.new(0, 160, 0, 28)
-    bg.StudsOffset = Vector3.new(0, (part.Size.Y or 2) / 2 + 0.9, 0)
-    bg.MaxDistance = 1000
-    bg.LightInfluence = 0
-    local ok, err = pcall(function() bg.Parent = LocalPlayer:WaitForChild("PlayerGui") end)
-    if not ok then
-        pcall(function() bg:Destroy() end)
-        return nil
-    end
-
-    local label = safeNew("TextLabel")
-    if not label then
-        pcall(function() bg:Destroy() end)
-        return nil
-    end
-    label.Name = "Label"
-    label.Size = UDim2.new(1, 0, 1, 0)
-    label.Position = UDim2.new(0, 0, 0, 0)
-    label.BackgroundTransparency = 1
-    label.Text = labelText or part.Name
-    label.TextColor3 = useGold and GOLD_COLOR or DEFAULT_TEXT_COLOR
-    label.TextStrokeColor3 = Color3.fromRGB(0,0,0)
-    label.TextStrokeTransparency = 0
-    label.Font = Enum.Font.GothamBold
-    label.TextScaled = false
-    label.TextSize = TEXT_SIZE
-    label.Parent = bg
-
-    part:GetPropertyChangedSignal("Size"):Connect(function()
-        if bg and bg.Parent then bg.StudsOffset = Vector3.new(0, part.Size.Y / 2 + 0.9, 0) end
+    -- ===== ЛОГИКА КИЛЛ АУРЫ (360 ГРАДУСОВ, БЕЗ СПАМА В ФИЗИКУ) =====
+    RunService.RenderStepped:Connect(function()
+        if not AuraActive then return end
+        pcall(function()
+            local char = LocalPlayer.Character
+            if not char or not char:FindFirstChild("HumanoidRootPart") then return end
+            local myRoot = char.HumanoidRootPart
+            
+            for _, player in ipairs(Players:GetPlayers()) do
+                if player ~= LocalPlayer and player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
+                    local targetRoot = player.Character.HumanoidRootPart
+                    local dist = (myRoot.Position - targetRoot.Position).Magnitude
+                    
+                    -- Если враг в радиусе 15 стадов — бьем
+                    if dist <= (ReachDistance + 2) then
+                        VirtualUser:CaptureController()
+                        VirtualUser:ClickButton1(Vector2.new())
+                        break -- Бьем только одного ближайшего, чтобы не спамить кликами
+                    end
+                end
+            end
+        end)
     end)
 
-    part:GetPropertyChangedSignal("Name"):Connect(function()
-        if label and label.Parent then label.Text = labelText or part.Name end
-    end)
-
-    return bg
-end
-
-local function createVisualsForAttach(part, labelText)
-    if not isBasePart(part) then return end
-    if itemVisuals[part] then return end
-
-    local nameLower = (labelText or part.Name):lower()
-    local useGold = prioritized[nameLower] == true
-    local created = {}
-
-    local sb = createSelectionBox(part, useGold)
-    if sb then table.insert(created, sb) end
-
-    local bb = createBillboard(part, labelText, useGold)
-    if bb then table.insert(created, bb) end
-
-    if #created > 0 then itemVisuals[part] = created end
-end
-
-local function applyToInstance(inst)
-    if not inst then return end
-    if inst:IsA("Model") then
-        local attach = getAttachPartForModel(inst)
-        if attach then createVisualsForAttach(attach, inst.Name) end
-    elseif isBasePart(inst) then
-        createVisualsForAttach(inst, inst.Name)
-    end
-end
-
-local function EnableItemEsp()
-    local folder = Workspace:FindFirstChild("items") or Workspace:FindFirstChild("Items")
-    if not folder then return end
-    
-    for _, child in ipairs(folder:GetChildren()) do
-        pcall(function() applyToInstance(child) end)
-    end
-
-    if itemEspConns.descAdded then itemEspConns.descAdded:Disconnect() end
-    if itemEspConns.descRemoving then itemEspConns.descRemoving:Disconnect() end
-
-    itemEspConns.descAdded = folder.DescendantAdded:Connect(function(desc)
-        task.wait(0.03)
-        pcall(function() applyToInstance(desc) end)
-    end)
-
-    itemEspConns.descRemoving = folder.DescendantRemoving:Connect(function(desc)
-        if desc:IsA("BasePart") then
-            destroyVisualsForPart(desc)
-        elseif desc:IsA("Model") then
-            local attach = getAttachPartForModel(desc)
-            if attach then destroyVisualsForPart(attach) end
+    -- ===== ЛОГИКА ESP (HIGHLIGHT) =====
+    local function UpdateEsp()
+        for _, player in ipairs(Players:GetPlayers()) do
+            if player ~= LocalPlayer then
+                pcall(function()
+                    if player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
+                        local highlight = player.Character:FindFirstChild("FoxESP")
+                        if EspActive then
+                            if not highlight then
+                                highlight = Instance.new("Highlight")
+                                highlight.Name = "FoxESP"
+                                highlight.FillColor = Color3.fromRGB(255, 0, 0)
+                                highlight.FillTransparency = 0.5
+                                highlight.OutlineColor = Color3.fromRGB(255, 255, 255)
+                                highlight.OutlineTransparency = 0
+                                highlight.Parent = player.Character
+                            end
+                        else
+                            if highlight then highlight:Destroy() end
+                        end
+                    end
+                end)
+            end
         end
+    end
+
+    Players.PlayerAdded:Connect(function(player)
+        player.CharacterAdded:Connect(function(char)
+            task.wait(2)
+            UpdateEsp()
+        end)
     end)
-end
-
-local function DisableItemEsp()
-    if itemEspConns.descAdded then itemEspConns.descAdded:Disconnect() itemEspConns.descAdded = nil end
-    if itemEspConns.descRemoving then itemEspConns.descRemoving:Disconnect() itemEspConns.descRemoving = nil end
     
-    for part, _ in pairs(itemVisuals) do
-        destroyVisualsForPart(part)
-    end
-    itemVisuals = {}
+    Players.PlayerRemoving:Connect(function(player)
+        pcall(function()
+            if player.Character and player.Character:FindFirstChild("FoxESP") then
+                player.Character.FoxESP:Destroy()
+            end
+        end)
+    end)
+
+    LocalPlayer.CharacterAdded:Connect(function()
+        task.wait(2)
+        UpdateEsp()
+    end)
+
+    -- КНОПКИ
+    ReachBtn.MouseButton1Click:Connect(function()
+        ReachActive = not ReachActive
+        ReachBtn.Text = "REACH (15st): " .. (ReachActive and "ON" or "OFF")
+        ReachBtn.BackgroundColor3 = ReachActive and Color3.fromRGB(0, 140, 70) or Color3.fromRGB(30, 30, 45)
+        ApplyGrip()
+    end)
+
+    AuraBtn.MouseButton1Click:Connect(function()
+        AuraActive = not AuraActive
+        AuraBtn.Text = "KILL AURA: " .. (AuraActive and "ON" or "OFF")
+        AuraBtn.BackgroundColor3 = AuraActive and Color3.fromRGB(140, 20, 20) or Color3.fromRGB(30, 30, 45)
+    end)
+
+    EspBtn.MouseButton1Click:Connect(function()
+        EspActive = not EspActive
+        EspBtn.Text = "PLAYER ESP: " .. (EspActive and "ON" or "OFF")
+        EspBtn.BackgroundColor3 = EspActive and Color3.fromRGB(0, 80, 170) or Color3.fromRGB(30, 30, 45)
+        UpdateEsp()
+    end)
+end)
+
+if not success then
+    warn("Ошибка загрузки: " .. tostring(err))
 end
-
-
--- ========================================================
--- ОБЩИЙ GUI
--- ========================================================
-local Gui = Instance.new("ScreenGui")
-Gui.Name = "FoxUltimateSlap"
-Gui.ResetOnSpawn = false
-Gui.Parent = LocalPlayer:WaitForChild("PlayerGui")
-
-local Frame = Instance.new("Frame")
-Frame.Size = UDim2.new(0, 250, 0, 310)
-Frame.Position = UDim2.new(0, 15, 0.2, 0)
-Frame.BackgroundColor3 = Color3.fromRGB(18, 18, 25)
-Frame.Parent = Gui
-Instance.new("UICorner", Frame).CornerRadius = UDim.new(0, 8)
-
-local Dragging, DragStart, StartPos
-Frame.InputBegan:Connect(function(input)
-    if input.UserInputType == Enum.UserInputType.MouseButton1 then
-        Dragging = true; DragStart = input.Position; StartPos = Frame.Position
-    end
-end)
-Frame.InputEnded:Connect(function(input)
-    if input.UserInputType == Enum.UserInputType.MouseButton1 then Dragging = false end
-end)
-UserInputService.InputChanged:Connect(function(input)
-    if Dragging and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
-        local Delta = input.Position - DragStart
-        Frame.Position = UDim2.new(StartPos.X.Scale, StartPos.X.Offset + Delta.X, StartPos.Y.Scale, StartPos.Y.Offset + Delta.Y)
-    end
-end)
-
-local Title = Instance.new("TextLabel")
-Title.Size = UDim2.new(1, 0, 0, 20)
-Title.BackgroundTransparency = 1
-Title.Text = "FOX ULTIMATE SLAP"
-Title.TextColor3 = Color3.fromRGB(0, 255, 120)
-Title.TextScaled = true
-Title.Font = Enum.Font.GothamBold
-Title.Parent = Frame
-
-local Status = Instance.new("TextLabel")
-Status.Size = UDim2.new(1, 0, 0, 15)
-Status.Position = UDim2.new(0, 0, 0, 20)
-Status.BackgroundTransparency = 1
-Status.Text = "Статус: Готов"
-Status.TextColor3 = Color3.fromRGB(200, 200, 200)
-Status.TextScaled = true
-Status.Font = Enum.Font.Gotham
-Status.Parent = Frame
-
-local function CreateBtn(name, yPos, color)
-    local btn = Instance.new("TextButton")
-    btn.Size = UDim2.new(0.9, 0, 0, 25)
-    btn.Position = UDim2.new(0.05, 0, 0, yPos)
-    btn.BackgroundColor3 = color
-    btn.Text = name
-    btn.TextColor3 = Color3.fromRGB(255, 255, 255)
-    btn.TextScaled = true
-    btn.Font = Enum.Font.GothamSemibold
-    btn.Parent = Frame
-    Instance.new("UICorner", btn).CornerRadius = UDim.new(0, 6)
-    return btn
-end
-
-local CollectBtn = CreateBtn("GHOST FARM: OFF", 40, Color3.fromRGB(0, 140, 70))
-local BuffsBtn = CreateBtn("АВТО БАФФЫ", 68, Color3.fromRGB(0, 80, 170))
-local BombsBtn = CreateBtn("АВТО БОМБЫ", 96, Color3.fromRGB(140, 20, 20))
-local ReachBtn = CreateBtn("REACH (15st): OFF", 130, Color3.fromRGB(30, 30, 45))
-local AuraBtn = CreateBtn("KILL AURA: OFF", 158, Color3.fromRGB(30, 30, 45))
-local PlayerEspBtn = CreateBtn("PLAYER ESP: OFF", 192, Color3.fromRGB(30, 30, 45))
-local ItemEspBtn = CreateBtn("ITEM ESP: OFF", 220, Color3.fromRGB(30, 30, 45))
-
--- ========================================================
--- КНОПКИ ЛОГИКА
--- ========================================================
-CollectBtn.MouseButton1Click:Connect(function()
-    AutoCollectActive = not AutoCollectActive
-    CollectBtn.Text = AutoCollectActive and "GHOST FARM: ON" or "GHOST FARM: OFF"
-    CollectBtn.BackgroundColor3 = AutoCollectActive and Color3.fromRGB(0, 200, 100) or Color3.fromRGB(0, 140, 70)
-    if AutoCollectActive then task.spawn(FastCollectLoop) end
-end)
-
-BuffsBtn.MouseButton1Click:Connect(function()
-    AutoBuffActive = not AutoBuffActive
-    BuffsBtn.Text = AutoBuffActive and "БАФФЫ: ON" or "АВТО БАФФЫ"
-    BuffsBtn.BackgroundColor3 = AutoBuffActive and Color3.fromRGB(0, 120, 220) or Color3.fromRGB(0, 80, 170)
-end)
-
-BombsBtn.MouseButton1Click:Connect(function()
-    AutoBombActive = not AutoBombActive
-    BombsBtn.Text = AutoBombActive and "БОМБЫ: ON" or "АВТО БОМБЫ"
-    BombsBtn.BackgroundColor3 = AutoBombActive and Color3.fromRGB(200, 30, 30) or Color3.fromRGB(140, 20, 20)
-end)
-
-ReachBtn.MouseButton1Click:Connect(function()
-    ReachActive = not ReachActive
-    ReachBtn.Text = "REACH (15st): " .. (ReachActive and "ON" or "OFF")
-    ReachBtn.BackgroundColor3 = ReachActive and Color3.fromRGB(0, 140, 70) or Color3.fromRGB(30, 30, 45)
-    ApplyGrip()
-end)
-
-AuraBtn.MouseButton1Click:Connect(function()
-    AuraActive = not AuraActive
-    AuraBtn.Text = "KILL AURA: " .. (AuraActive and "ON" or "OFF")
-    AuraBtn.BackgroundColor3 = AuraActive and Color3.fromRGB(140, 20, 20) or Color3.fromRGB(30, 30, 45)
-end)
-
-PlayerEspBtn.MouseButton1Click:Connect(function()
-    PlayerEspActive = not PlayerEspActive
-    PlayerEspBtn.Text = "PLAYER ESP: " .. (PlayerEspActive and "ON" or "OFF")
-    PlayerEspBtn.BackgroundColor3 = PlayerEspActive and Color3.fromRGB(0, 80, 170) or Color3.fromRGB(30, 30, 45)
-    UpdatePlayerEsp()
-end)
-
-ItemEspBtn.MouseButton1Click:Connect(function()
-    ItemEspActive = not ItemEspActive
-    ItemEspBtn.Text = "ITEM ESP: " .. (ItemEspActive and "ON" or "OFF")
-    ItemEspBtn.BackgroundColor3 = ItemEspActive and Color3.fromRGB(150, 100, 0) or Color3.fromRGB(30, 30, 45)
-    if ItemEspActive then EnableItemEsp() else DisableItemEsp() end
-end)

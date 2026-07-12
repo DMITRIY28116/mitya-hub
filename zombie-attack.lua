@@ -1,730 +1,501 @@
--- ===========================================================
--- Zombie Attack Hub – полностью исправленная версия
--- Все русские ключевые слова заменены на английские,
--- task → wait/spawn, CoreGui → PlayerGui,
--- внешние скрипты загружаются через универсальный httpGet.
--- Открыть/закрыть: K
--- ===========================================================
+local ZombieAttackGUI = Instance.new("ScreenGui")
+local Main = Instance.new("Frame")
+local TextLabel_2 = Instance.new("TextLabel") -- заголовок
+local Frame = Instance.new("Frame")
+local TextLabel_3 = Instance.new("TextLabel")
+local ConsoleFrame = Instance.new("Frame")
+local Console = Instance.new("TextLabel")
+local Frame_2 = Instance.new("Frame")
+local TextLabel_4 = Instance.new("TextLabel")
+local Frame_3 = Instance.new("Frame")
+local TextLabel_5 = Instance.new("TextLabel")
+local Frame_4 = Instance.new("Frame")
+local TextLabel_6 = Instance.new("TextLabel")
+local KillPlatform = Instance.new("TextButton")
+local StealKills = Instance.new("TextButton")
+local AutoFarm = Instance.new("TextButton")
+local NoRecoil = Instance.new("TextButton")
+local Guns = Instance.new("TextButton")
+local Knifes = Instance.new("TextButton")
+local Fly = Instance.new("TextButton")
+local Noclip = Instance.new("TextButton")
+local Gravity = Instance.new("TextButton")
+local Speed = Instance.new("TextButton")
+local Jump = Instance.new("TextButton")
+local Btools = Instance.new("TextButton")
 
-local Players = game:GetService("Players")
-local UserInputService = game:GetService("UserInputService")
-local TweenService = game:GetService("TweenService")
-local RunService = game:GetService("RunService")
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local Workspace = game:GetService("Workspace")
-local PlayerGui = Players.LocalPlayer:WaitForChild("PlayerGui")  -- вместо CoreGui
-local LocalPlayer = Players.LocalPlayer
+ZombieAttackGUI.Name = "MityaHub_ZombieAttack"
+ZombieAttackGUI.Parent = game.CoreGui
+ZombieAttackGUI.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
 
--- ========== УНИВЕРСАЛЬНЫЙ HTTP-ЗАГРУЗЧИК (для внешних скриптов) ==========
-local function httpGet(url)
-    local methods = {
-        function() return syn and syn.request({ Url = url, Method = "GET" }).Body end,
-        function() return http_request and http_request({ Url = url }).Body end,
-        function() return request and request({ Url = url }).Body end,
-        function() return game:HttpGet(url, true) end  -- запасной
-    }
-    for _, method in ipairs(methods) do
-        local success, result = pcall(method)
-        if success and result then return result end
-    end
-    error("Не удалось загрузить: " .. url)
-end
+Main.Name = "Main"
+Main.Parent = ZombieAttackGUI
+Main.BackgroundColor3 = Color3.new(0, 0, 0) -- чёрный
+Main.BackgroundTransparency = 0.15
+Main.BorderSizePixel = 0
+Main.Position = UDim2.new(0.794708014, 0, 0, 0)
+Main.Size = UDim2.new(0.191605836, 0, 1, 0)
 
--- ========== СОСТОЯНИЯ ТОГГЛОВ ==========
-local toggleStates = {
-    Fly = false,
-    Noclip = false,
-    Gravity = false,
-    Speed = false,
-    Jump = false,
-    AutoFarm = false,
-    KillPlatform = false,
-    StealKills = false,
-    NoRecoil = false,
-    HitboxExpand = false,
-    Reach = false,
-}
+-- Заголовок (без упоминания ibrahim Dew)
+TextLabel_2.Parent = Main
+TextLabel_2.BackgroundColor3 = Color3.new(1, 1, 1)
+TextLabel_2.BackgroundTransparency = 1
+TextLabel_2.BorderSizePixel = 0
+TextLabel_2.Position = UDim2.new(0.0434782468, 0, 0.0118953418, 0)
+TextLabel_2.Size = UDim2.new(0.90476191, 0, 0.0569259971, 0)
+TextLabel_2.Font = Enum.Font.SourceSansSemibold
+TextLabel_2.Text = "MityaHub / Zombie Attack"
+TextLabel_2.TextColor3 = Color3.new(1, 1, 1)
+TextLabel_2.TextScaled = true
+TextLabel_2.TextSize = 14
+TextLabel_2.TextWrapped = true
 
--- ========== ПЕРЕМЕННЫЕ ДЛЯ ПОТОКОВ ==========
-local noclipConn = nil
-local farmConn = nil
-local hitboxConn = nil
-local reachConn = nil
-local expandedParts = {}
-local globalTarget = nil
-local farmAttackThread = nil
-local noRecoilThread = nil
-local stealKillsThread = nil
-local stealKillsActive = false  -- флаг для остановки цикла
+-- Остальные элементы (без изменения, только цвета)
+Frame.Parent = Main
+Frame.BackgroundColor3 = Color3.new(0.0156863, 0.0156863, 0.0156863)
+Frame.BackgroundTransparency = 0.5
+Frame.BorderSizePixel = 0
+Frame.Position = UDim2.new(0, 0, 0.111954458, 0)
+Frame.Size = UDim2.new(1, 0, 0.0417457297, 0)
 
--- ========== УДАЛЯЕМ СТАРЫЙ GUI ==========
-pcall(function() PlayerGui:FindFirstChild("ZombieAttackHub"):Destroy() end)
+TextLabel_3.Parent = Frame
+TextLabel_3.BackgroundColor3 = Color3.new(1, 1, 1)
+TextLabel_3.BackgroundTransparency = 1
+TextLabel_3.BorderSizePixel = 0
+TextLabel_3.Position = UDim2.new(0.0434782468, 0, 0.181818187, 0)
+TextLabel_3.Size = UDim2.new(0.90476191, 0, 0.590909064, 0)
+TextLabel_3.Font = Enum.Font.SourceSansSemibold
+TextLabel_3.Text = "Console"
+TextLabel_3.TextColor3 = Color3.new(1, 1, 1)
+TextLabel_3.TextScaled = true
+TextLabel_3.TextSize = 14
+TextLabel_3.TextWrapped = true
+TextLabel_3.TextXAlignment = Enum.TextXAlignment.Left
 
--- ========== СОЗДАНИЕ GUI ==========
-local screenGui = Instance.new("ScreenGui")
-screenGui.Name = "ZombieAttackHub"
-screenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
-screenGui.Parent = PlayerGui  -- изменено
+ConsoleFrame.Name = "ConsoleFrame"
+ConsoleFrame.Parent = Main
+ConsoleFrame.BackgroundColor3 = Color3.new(0.156863, 0.156863, 0.156863)
+ConsoleFrame.BackgroundTransparency = 0.5
+ConsoleFrame.BorderSizePixel = 0
+ConsoleFrame.Position = UDim2.new(0, 0, 0.153700188, 0)
+ConsoleFrame.Size = UDim2.new(1, 0, 0.0967741907, 0)
 
--- Главное окно
-local mainFrame = Instance.new("Frame")
-mainFrame.Name = "MainFrame"
-mainFrame.Size = UDim2.new(0, 420, 0, 550)
-mainFrame.Position = UDim2.new(0.5, -210, 0.5, -275)
-mainFrame.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
-mainFrame.BackgroundTransparency = 0.1
-mainFrame.BorderSizePixel = 0
-mainFrame.ClipsDescendants = false
-mainFrame.Parent = screenGui
+Console.Name = "Console"
+Console.Parent = ConsoleFrame
+Console.BackgroundColor3 = Color3.new(1, 1, 1)
+Console.BackgroundTransparency = 1
+Console.BorderSizePixel = 0
+Console.Position = UDim2.new(0.0387163423, 0, 0.117647059, 0)
+Console.Size = UDim2.new(0.909523785, 0, 0.764705896, 0)
+Console.Font = Enum.Font.SourceSans
+Console.Text = "Status: Ready to use\n\n"
+Console.TextColor3 = Color3.new(0.333333, 1, 0)
+Console.TextScaled = true
+Console.TextSize = 14
+Console.TextWrapped = true
+Console.TextXAlignment = Enum.TextXAlignment.Left
+Console.TextYAlignment = Enum.TextYAlignment.Top
 
--- Тень
-local shadow = Instance.new("Frame")
-shadow.Size = UDim2.new(1, 12, 1, 12)
-shadow.Position = UDim2.new(0, -6, 0, -6)
-shadow.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
-shadow.BackgroundTransparency = 0.6
-shadow.BorderSizePixel = 0
-shadow.Parent = mainFrame
-Instance.new("UICorner", shadow).CornerRadius = UDim.new(0, 16)
-Instance.new("UICorner", mainFrame).CornerRadius = UDim.new(0, 12)
+Frame_2.Parent = Main
+Frame_2.BackgroundColor3 = Color3.new(0.0156863, 0.0156863, 0.0156863)
+Frame_2.BackgroundTransparency = 0.5
+Frame_2.BorderSizePixel = 0
+Frame_2.Position = UDim2.new(0, 0, 0.250474393, 0)
+Frame_2.Size = UDim2.new(0.995238066, 0, 0.0417457297, 0)
 
--- ========== ЗАГОЛОВОК ==========
-local titleBar = Instance.new("Frame")
-titleBar.Size = UDim2.new(1, 0, 0, 45)
-titleBar.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
-titleBar.BorderSizePixel = 0
-titleBar.Parent = mainFrame
-Instance.new("UICorner", titleBar).CornerRadius = UDim.new(0, 12)
+TextLabel_4.Parent = Frame_2
+TextLabel_4.BackgroundColor3 = Color3.new(1, 1, 1)
+TextLabel_4.BackgroundTransparency = 1
+TextLabel_4.BorderSizePixel = 0
+TextLabel_4.Position = UDim2.new(0.0482401513, 0, 0.181818187, 0)
+TextLabel_4.Size = UDim2.new(0.904306233, 0, 0.590909064, 0)
+TextLabel_4.Font = Enum.Font.SourceSansSemibold
+TextLabel_4.Text = "Main Mods"
+TextLabel_4.TextColor3 = Color3.new(1, 1, 1)
+TextLabel_4.TextScaled = true
+TextLabel_4.TextSize = 14
+TextLabel_4.TextWrapped = true
+TextLabel_4.TextXAlignment = Enum.TextXAlignment.Left
 
-local logo = Instance.new("Frame")
-logo.Size = UDim2.new(0, 28, 0, 28)
-logo.Position = UDim2.new(0, 10, 0.5, -14)
-logo.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-logo.BorderSizePixel = 0
-logo.Parent = titleBar
-Instance.new("UICorner", logo).CornerRadius = UDim.new(0, 6)
-local logoText = Instance.new("TextLabel", logo)
-logoText.Size = UDim2.new(1, 0, 1, 0)
-logoText.BackgroundTransparency = 1
-logoText.Text = "Z"
-logoText.TextColor3 = Color3.fromRGB(0, 0, 0)
-logoText.TextScaled = true
-logoText.Font = Enum.Font.GothamBold
+Frame_3.Parent = Main
+Frame_3.BackgroundColor3 = Color3.new(0.0156863, 0.0156863, 0.0156863)
+Frame_3.BackgroundTransparency = 0.5
+Frame_3.BorderSizePixel = 0
+Frame_3.Position = UDim2.new(0, 0, 0.455407977, 0)
+Frame_3.Size = UDim2.new(1, 0, 0.0417457297, 0)
 
-local titleLabel = Instance.new("TextLabel")
-titleLabel.Size = UDim2.new(1, -60, 1, 0)
-titleLabel.Position = UDim2.new(0, 45, 0, 0)
-titleLabel.BackgroundTransparency = 1
-titleLabel.Text = "Атака зомби"
-titleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
-titleLabel.TextSize = 20
-titleLabel.Font = Enum.Font.GothamBold
-titleLabel.TextXAlignment = Enum.TextXAlignment.Left
-titleLabel.Parent = titleBar
+TextLabel_5.Parent = Frame_3
+TextLabel_5.BackgroundColor3 = Color3.new(1, 1, 1)
+TextLabel_5.BackgroundTransparency = 1
+TextLabel_5.BorderSizePixel = 0
+TextLabel_5.Position = UDim2.new(0.0434782468, 0, 0.181818187, 0)
+TextLabel_5.Size = UDim2.new(0.90476191, 0, 0.590909064, 0)
+TextLabel_5.Font = Enum.Font.SourceSansSemibold
+TextLabel_5.Text = "Weapon Mods"
+TextLabel_5.TextColor3 = Color3.new(1, 1, 1)
+TextLabel_5.TextScaled = true
+TextLabel_5.TextSize = 14
+TextLabel_5.TextWrapped = true
+TextLabel_5.TextXAlignment = Enum.TextXAlignment.Left
 
-local closeBtn = Instance.new("TextButton")
-closeBtn.Size = UDim2.new(0, 28, 0, 28)
-closeBtn.Position = UDim2.new(1, -36, 0.5, -14)
-closeBtn.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
-closeBtn.BackgroundTransparency = 0.5
-closeBtn.BorderSizePixel = 0
-closeBtn.Text = "✕"
-closeBtn.TextColor3 = Color3.fromRGB(200, 200, 200)
-closeBtn.TextSize = 18
-closeBtn.Font = Enum.Font.Gotham
-closeBtn.Parent = titleBar
-Instance.new("UICorner", closeBtn).CornerRadius = UDim.new(1, 0)
-closeBtn.MouseButton1Click:Connect(function() mainFrame.Visible = false end)
+Frame_4.Parent = Main
+Frame_4.BackgroundColor3 = Color3.new(0.0156863, 0.0156863, 0.0156863)
+Frame_4.BackgroundTransparency = 0.5
+Frame_4.BorderSizePixel = 0
+Frame_4.Position = UDim2.new(0, 0, 0.65464896, 0)
+Frame_4.Size = UDim2.new(0.995238066, 0, 0.0417457297, 0)
 
-local minBtn = Instance.new("TextButton")
-minBtn.Size = UDim2.new(0, 28, 0, 28)
-minBtn.Position = UDim2.new(1, -72, 0.5, -14)
-minBtn.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
-minBtn.BackgroundTransparency = 0.5
-minBtn.BorderSizePixel = 0
-minBtn.Text = "−"
-minBtn.TextColor3 = Color3.fromRGB(200, 200, 200)
-minBtn.TextSize = 18
-minBtn.Font = Enum.Font.Gotham
-minBtn.Parent = titleBar
-Instance.new("UICorner", minBtn).CornerRadius = UDim.new(1, 0)
-local isMinimized = false
-minBtn.MouseButton1Click:Connect(function()
-    isMinimized = not isMinimized
-    local size = isMinimized and UDim2.new(0, 420, 0, 45) or UDim2.new(0, 420, 0, 550)
-    TweenService:Create(mainFrame, TweenInfo.new(0.3), {Size = size}):Play()
+TextLabel_6.Parent = Frame_4
+TextLabel_6.BackgroundColor3 = Color3.new(1, 1, 1)
+TextLabel_6.BackgroundTransparency = 1
+TextLabel_6.BorderSizePixel = 0
+TextLabel_6.Position = UDim2.new(0.0482401513, 0, 0.18181771, 0)
+TextLabel_6.Size = UDim2.new(0.909090936, 0, 0.590909064, 0)
+TextLabel_6.Font = Enum.Font.SourceSansSemibold
+TextLabel_6.Text = "Local Player Mods"
+TextLabel_6.TextColor3 = Color3.new(1, 1, 1)
+TextLabel_6.TextScaled = true
+TextLabel_6.TextSize = 14
+TextLabel_6.TextWrapped = true
+TextLabel_6.TextXAlignment = Enum.TextXAlignment.Left
+
+-- Кнопки (все с белым текстом)
+KillPlatform.Name = "KillPlatform"
+KillPlatform.Parent = Main
+KillPlatform.BackgroundColor3 = Color3.new(1, 1, 1)
+KillPlatform.BackgroundTransparency = 1
+KillPlatform.Position = UDim2.new(0.0434782468, 0, 0.309297919, 0)
+KillPlatform.Size = UDim2.new(0.90476191, 0, 0.034155596, 0)
+KillPlatform.Font = Enum.Font.SourceSansSemibold
+KillPlatform.Text = "Kill Platform "
+KillPlatform.TextColor3 = Color3.new(1, 1, 1)
+KillPlatform.TextScaled = true
+KillPlatform.TextSize = 14
+KillPlatform.TextWrapped = true
+KillPlatform.TextXAlignment = Enum.TextXAlignment.Left
+
+StealKills.Name = "StealKills"
+StealKills.Parent = Main
+StealKills.BackgroundColor3 = Color3.new(1, 1, 1)
+StealKills.BackgroundTransparency = 1
+StealKills.Position = UDim2.new(0.0434782468, 0, 0.354838729, 0)
+StealKills.Size = UDim2.new(0.90476191, 0, 0.034155596, 0)
+StealKills.Font = Enum.Font.SourceSansSemibold
+StealKills.Text = "Steal Kills"
+StealKills.TextColor3 = Color3.new(1, 1, 1)
+StealKills.TextScaled = true
+StealKills.TextSize = 14
+StealKills.TextWrapped = true
+StealKills.TextXAlignment = Enum.TextXAlignment.Left
+
+AutoFarm.Name = "AutoFarm"
+AutoFarm.Parent = Main
+AutoFarm.BackgroundColor3 = Color3.new(1, 1, 1)
+AutoFarm.BackgroundTransparency = 1
+AutoFarm.Position = UDim2.new(0.0434782468, 0, 0.400379539, 0)
+AutoFarm.Size = UDim2.new(0.90476191, 0, 0.034155596, 0)
+AutoFarm.Font = Enum.Font.SourceSansSemibold
+AutoFarm.Text = "Auto Farm"
+AutoFarm.TextColor3 = Color3.new(1, 1, 1)
+AutoFarm.TextScaled = true
+AutoFarm.TextSize = 14
+AutoFarm.TextWrapped = true
+AutoFarm.TextXAlignment = Enum.TextXAlignment.Left
+
+NoRecoil.Name = "NoRecoil"
+NoRecoil.Parent = Main
+NoRecoil.BackgroundColor3 = Color3.new(1, 1, 1)
+NoRecoil.BackgroundTransparency = 1
+NoRecoil.Position = UDim2.new(0.0434782468, 0, 0.510436416, 0)
+NoRecoil.Size = UDim2.new(0.90476191, 0, 0.034155596, 0)
+NoRecoil.Font = Enum.Font.SourceSansSemibold
+NoRecoil.Text = "No Recoil"
+NoRecoil.TextColor3 = Color3.new(1, 1, 1)
+NoRecoil.TextScaled = true
+NoRecoil.TextSize = 14
+NoRecoil.TextWrapped = true
+NoRecoil.TextXAlignment = Enum.TextXAlignment.Left
+
+Guns.Name = "Guns"
+Guns.Parent = Main
+Guns.BackgroundColor3 = Color3.new(1, 1, 1)
+Guns.BackgroundTransparency = 1
+Guns.Position = UDim2.new(0.0434782468, 0, 0.555977225, 0)
+Guns.Size = UDim2.new(0.90476191, 0, 0.034155596, 0)
+Guns.Font = Enum.Font.SourceSansSemibold
+Guns.Text = "Equip All Guns"
+Guns.TextColor3 = Color3.new(1, 1, 1)
+Guns.TextScaled = true
+Guns.TextSize = 14
+Guns.TextWrapped = true
+Guns.TextXAlignment = Enum.TextXAlignment.Left
+
+Knifes.Name = "Knifes"
+Knifes.Parent = Main
+Knifes.BackgroundColor3 = Color3.new(1, 1, 1)
+Knifes.BackgroundTransparency = 1
+Knifes.Position = UDim2.new(0.0434782468, 0, 0.603415549, 0)
+Knifes.Size = UDim2.new(0.90476191, 0, 0.034155596, 0)
+Knifes.Font = Enum.Font.SourceSansSemibold
+Knifes.Text = "Equip All Knifes "
+Knifes.TextColor3 = Color3.new(1, 1, 1)
+Knifes.TextScaled = true
+Knifes.TextSize = 14
+Knifes.TextWrapped = true
+Knifes.TextXAlignment = Enum.TextXAlignment.Left
+
+Fly.Name = "Fly"
+Fly.Parent = Main
+Fly.BackgroundColor3 = Color3.new(1, 1, 1)
+Fly.BackgroundTransparency = 1
+Fly.Position = UDim2.new(0.0434782468, 0, 0.709677398, 0)
+Fly.Size = UDim2.new(0.90476191, 0, 0.034155596, 0)
+Fly.Font = Enum.Font.SourceSansSemibold
+Fly.Text = "Toggle Flying Mode"
+Fly.TextColor3 = Color3.new(1, 1, 1)
+Fly.TextScaled = true
+Fly.TextSize = 14
+Fly.TextWrapped = true
+Fly.TextXAlignment = Enum.TextXAlignment.Left
+
+Noclip.Name = "Noclip"
+Noclip.Parent = Main
+Noclip.BackgroundColor3 = Color3.new(1, 1, 1)
+Noclip.BackgroundTransparency = 1
+Noclip.Position = UDim2.new(0.0434782468, 0, 0.755218208, 0)
+Noclip.Size = UDim2.new(0.90476191, 0, 0.034155596, 0)
+Noclip.Font = Enum.Font.SourceSansSemibold
+Noclip.Text = "Toggle NoClip"
+Noclip.TextColor3 = Color3.new(1, 1, 1)
+Noclip.TextScaled = true
+Noclip.TextSize = 14
+Noclip.TextWrapped = true
+Noclip.TextXAlignment = Enum.TextXAlignment.Left
+
+Gravity.Name = "Gravity"
+Gravity.Parent = Main
+Gravity.BackgroundColor3 = Color3.new(1, 1, 1)
+Gravity.BackgroundTransparency = 1
+Gravity.Position = UDim2.new(0.0387163423, 0, 0.802656531, 0)
+Gravity.Size = UDim2.new(0.90476191, 0, 0.034155596, 0)
+Gravity.Font = Enum.Font.SourceSansSemibold
+Gravity.Text = "Low Gravity"
+Gravity.TextColor3 = Color3.new(1, 1, 1)
+Gravity.TextScaled = true
+Gravity.TextSize = 14
+Gravity.TextWrapped = true
+Gravity.TextXAlignment = Enum.TextXAlignment.Left
+
+Speed.Name = "Speed"
+Speed.Parent = Main
+Speed.BackgroundColor3 = Color3.new(1, 1, 1)
+Speed.BackgroundTransparency = 1
+Speed.Position = UDim2.new(0.0387163423, 0, 0.851992369, 0)
+Speed.Size = UDim2.new(0.90476191, 0, 0.034155596, 0)
+Speed.Font = Enum.Font.SourceSansSemibold
+Speed.Text = "Super Speed"
+Speed.TextColor3 = Color3.new(1, 1, 1)
+Speed.TextScaled = true
+Speed.TextSize = 14
+Speed.TextWrapped = true
+Speed.TextXAlignment = Enum.TextXAlignment.Left
+
+Jump.Name = "Jump"
+Jump.Parent = Main
+Jump.BackgroundColor3 = Color3.new(1, 1, 1)
+Jump.BackgroundTransparency = 1
+Jump.Position = UDim2.new(0.0434782468, 0, 0.899430692, 0)
+Jump.Size = UDim2.new(0.90476191, 0, 0.034155596, 0)
+Jump.Font = Enum.Font.SourceSansSemibold
+Jump.Text = "Super Jump"
+Jump.TextColor3 = Color3.new(1, 1, 1)
+Jump.TextScaled = true
+Jump.TextSize = 14
+Jump.TextWrapped = true
+Jump.TextXAlignment = Enum.TextXAlignment.Left
+
+Btools.Name = "Btools"
+Btools.Parent = Main
+Btools.BackgroundColor3 = Color3.new(1, 1, 1)
+Btools.BackgroundTransparency = 1
+Btools.Position = UDim2.new(0.0434782468, 0, 0.946869016, 0)
+Btools.Size = UDim2.new(0.90476191, 0, 0.034155596, 0)
+Btools.Font = Enum.Font.SourceSansSemibold
+Btools.Text = "B-Tools"
+Btools.TextColor3 = Color3.new(1, 1, 1)
+Btools.TextScaled = true
+Btools.TextSize = 14
+Btools.TextWrapped = true
+Btools.TextXAlignment = Enum.TextXAlignment.Left
+
+-- Скрипты (без изменений)
+Fly.MouseButton1Click:Connect(function()
+    Console.Text = ("Press E to activate and deactivate flying mode\n\n ")
+    wait(0.2)
+    loadstring(game:HttpGet(('https://pastebin.com/raw/7rXZ9VNc'),true))()
+    wait(5)
+    Console.Text = ("Status: Ready To Use\n\n")
 end)
 
--- Двойной клик по заголовку
-titleBar.InputBegan:Connect(function(input)
-    if input.UserInputType == Enum.UserInputType.MouseButton1 and input.UserInputState == Enum.UserInputState.Begin and input.ClickCount == 2 then
-        isMinimized = not isMinimized
-        local size = isMinimized and UDim2.new(0, 420, 0, 45) or UDim2.new(0, 420, 0, 550)
-        TweenService:Create(mainFrame, TweenInfo.new(0.3), {Size = size}):Play()
-    end
-end)
-
--- Перетаскивание
-local dragToggle, dragInput, dragStart, startPos
-titleBar.InputBegan:Connect(function(input)
-    if input.UserInputType == Enum.UserInputType.MouseButton1 then
-        dragToggle = true
-        dragStart = input.Position
-        startPos = mainFrame.Position
-        input.Changed:Connect(function()
-            if input.UserInputState == Enum.UserInputState.End then dragToggle = false end
-        end)
-    end
-end)
-titleBar.InputChanged:Connect(function(input)
-    if input.UserInputType == Enum.UserInputType.MouseMovement then dragInput = input end
-end)
-UserInputService.InputChanged:Connect(function(input)
-    if input == dragInput and dragToggle then
-        local delta = input.Position - dragStart
-        mainFrame.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
-    end
-end)
-
--- ========== КОНТЕЙНЕР С КНОПКАМИ (СКРОЛЛ) ==========
-local contentFrame = Instance.new("ScrollingFrame")
-contentFrame.Size = UDim2.new(1, -16, 1, -95)
-contentFrame.Position = UDim2.new(0, 8, 0, 55)
-contentFrame.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
-contentFrame.BackgroundTransparency = 0
-contentFrame.BorderSizePixel = 0
-contentFrame.CanvasSize = UDim2.new(0, 0, 0, 0)
-contentFrame.ScrollBarThickness = 6
-contentFrame.Parent = mainFrame
-Instance.new("UICorner", contentFrame).CornerRadius = UDim.new(0, 8)
-
--- ========== КОНСОЛЬ ==========
-local consoleFrame = Instance.new("Frame")
-consoleFrame.Size = UDim2.new(1, -16, 0, 30)
-consoleFrame.Position = UDim2.new(0, 8, 1, -36)
-consoleFrame.BackgroundColor3 = Color3.fromRGB(10, 10, 10)
-consoleFrame.BackgroundTransparency = 0.3
-consoleFrame.BorderSizePixel = 0
-consoleFrame.Parent = mainFrame
-Instance.new("UICorner", consoleFrame).CornerRadius = UDim.new(0, 6)
-local consoleLabel = Instance.new("TextLabel", consoleFrame)
-consoleLabel.Size = UDim2.new(1, -6, 1, -4)
-consoleLabel.Position = UDim2.new(0, 3, 0, 2)
-consoleLabel.BackgroundTransparency = 1
-consoleLabel.Font = Enum.Font.Code
-consoleLabel.Text = "Статус: Готово"
-consoleLabel.TextColor3 = Color3.fromRGB(80, 255, 80)
-consoleLabel.TextSize = 11
-consoleLabel.TextWrapped = true
-consoleLabel.TextXAlignment = Enum.TextXAlignment.Left
-
-local function logConsole(text, color)
-    consoleLabel.Text = text
-    consoleLabel.TextColor3 = color or Color3.fromRGB(80, 255, 80)
-end
-
--- ========== ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ ДЛЯ КНОПОК ==========
-local function createToggleButton(parent, label, yPos, callback)
-    local btn = Instance.new("TextButton")
-    btn.Size = UDim2.new(0.92, 0, 0, 32)
-    btn.Position = UDim2.new(0.04, 0, 0, yPos)
-    btn.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
-    btn.BorderSizePixel = 0
-    btn.Text = " " .. label
-    btn.TextColor3 = Color3.fromRGB(220, 220, 220)
-    btn.TextSize = 14
-    btn.Font = Enum.Font.Gotham
-    btn.TextXAlignment = Enum.TextXAlignment.Left
-    btn.AutoButtonColor = false
-    btn.Parent = parent
-    Instance.new("UICorner", btn).CornerRadius = UDim.new(0, 6)
-    local indicator = Instance.new("Frame")
-    indicator.Size = UDim2.new(0, 12, 0, 12)
-    indicator.Position = UDim2.new(1, -18, 0.5, -6)
-    indicator.BackgroundColor3 = Color3.fromRGB(150, 30, 30)
-    indicator.BorderSizePixel = 0
-    indicator.Parent = btn
-    Instance.new("UICorner", indicator).CornerRadius = UDim.new(1, 0)
-    -- Ховер
-    btn.MouseEnter:Connect(function()
-        TweenService:Create(btn, TweenInfo.new(0.15), {BackgroundColor3 = Color3.fromRGB(55, 55, 55)}):Play()
-    end)
-    btn.MouseLeave:Connect(function()
-        TweenService:Create(btn, TweenInfo.new(0.15), {BackgroundColor3 = Color3.fromRGB(35, 35, 35)}):Play()
-    end)
-    btn.MouseButton1Click:Connect(function()
-        callback(btn, indicator)
-        TweenService:Create(btn, TweenInfo.new(0.1), {BackgroundColor3 = Color3.fromRGB(80, 80, 80)}):Play()
-        wait(0.1)
-        TweenService:Create(btn, TweenInfo.new(0.1), {BackgroundColor3 = Color3.fromRGB(35, 35, 35)}):Play()
-    end)
-    return btn, indicator
-end
-
-local function createActionButton(parent, label, yPos, callback)
-    local btn = Instance.new("TextButton")
-    btn.Size = UDim2.new(0.92, 0, 0, 32)
-    btn.Position = UDim2.new(0.04, 0, 0, yPos)
-    btn.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
-    btn.BorderSizePixel = 0
-    btn.Text = " " .. label
-    btn.TextColor3 = Color3.fromRGB(220, 220, 220)
-    btn.TextSize = 14
-    btn.Font = Enum.Font.Gotham
-    btn.TextXAlignment = Enum.TextXAlignment.Left
-    btn.AutoButtonColor = false
-    btn.Parent = parent
-    Instance.new("UICorner", btn).CornerRadius = UDim.new(0, 6)
-    btn.MouseEnter:Connect(function()
-        TweenService:Create(btn, TweenInfo.new(0.15), {BackgroundColor3 = Color3.fromRGB(55, 55, 55)}):Play()
-    end)
-    btn.MouseLeave:Connect(function()
-        TweenService:Create(btn, TweenInfo.new(0.15), {BackgroundColor3 = Color3.fromRGB(35, 35, 35)}):Play()
-    end)
-    btn.MouseButton1Click:Connect(function()
-        callback()
-        TweenService:Create(btn, TweenInfo.new(0.1), {BackgroundColor3 = Color3.fromRGB(80, 80, 80)}):Play()
-        wait(0.1)
-        TweenService:Create(btn, TweenInfo.new(0.1), {BackgroundColor3 = Color3.fromRGB(35, 35, 35)}):Play()
-    end)
-    return btn
-end
-
-local function updateIndicator(ind, state)
-    if ind then ind.BackgroundColor3 = state and Color3.fromRGB(30, 180, 30) or Color3.fromRGB(150, 30, 30) end
-end
-
--- ========== РАЗМЕЩЕНИЕ КНОПОК ==========
-local yOff = 8
-
--- Kill Platform
-createToggleButton(contentFrame, "Kill Platform", yOff, function(btn, ind)
-    toggleStates.KillPlatform = not toggleStates.KillPlatform
-    updateIndicator(ind, toggleStates.KillPlatform)
-    if toggleStates.KillPlatform then
-        local char = LocalPlayer.Character
-        if char and char:FindFirstChild("HumanoidRootPart") then
-            local root = char.HumanoidRootPart
-            local platform = Instance.new("Part")
-            platform.Name = "MityaKillPlatform"
-            platform.Size = Vector3.new(100, 0.5, 100)
-            platform.Anchored = true
-            platform.Position = Vector3.new(555, 555, 555)
-            platform.Material = Enum.Material.Neon
-            platform.Color = Color3.fromRGB(120, 0, 180)
-            platform.Parent = Workspace
-            root.CFrame = platform.CFrame * CFrame.new(0, 4, 0)
-            pcall(function()
-                for _, a in pairs(Workspace.enemies:GetChildren()) do
-                    for _, b in pairs(a:GetChildren()) do
-                        if b:IsA("BasePart") then b.Anchored = true; b.CFrame = root.CFrame * CFrame.new(2,0,2) end
-                    end
-                end
-            end)
-        end
-        logConsole("Kill Platform: Active", Color3.fromRGB(30, 180, 30))
-    else
-        pcall(function() Workspace:FindFirstChild("MityaKillPlatform"):Destroy() end)
-        logConsole("Kill Platform: Disabled", Color3.fromRGB(150, 30, 30))
-    end
-end)
-yOff = yOff + 38
-
--- Steal Kills
-createToggleButton(contentFrame, "Steal Kills", yOff, function(btn, ind)
-    toggleStates.StealKills = not toggleStates.StealKills
-    updateIndicator(ind, toggleStates.StealKills)
-    if toggleStates.StealKills then
-        stealKillsActive = true
-        stealKillsThread = spawn(function()
-            while stealKillsActive do
-                wait(0.1)
-                pcall(function()
-                    for _, v in pairs(Workspace.enemies:GetChildren()) do
-                        if v:FindFirstChild("Humanoid") and v.Humanoid.Health < v.Humanoid.MaxHealth * 0.5 then
-                            local char = LocalPlayer.Character
-                            if char and char:FindFirstChildOfClass("Tool") then
-                                ReplicatedStorage.Gun:FireServer({
-                                    Normal = Vector3.new(0,0,0),
-                                    Direction = v.Head.Position,
-                                    Name = char:FindFirstChildOfClass("Tool").Name,
-                                    Hit = v.Head,
-                                    Origin = v.Head.Position,
-                                    Pos = v.Head.Position,
-                                })
-                            end
-                        end
-                    end
-                end)
+Noclip.MouseButton1Click:connect(function()
+    if Console.Text == "Toggle NoClip" then
+        noclip = true
+        Console.Text = "Toggle NoClip: On"
+        Console.TextColor3 = Color3.new(0,185,0)
+        game:GetService('RunService').Stepped:connect(function()
+            if noclip then
+                game.Players.LocalPlayer.Character.Humanoid:ChangeState(11)
             end
         end)
-        logConsole("Steal Kills: Active", Color3.fromRGB(30, 180, 30))
-    else
-        stealKillsActive = false
-        if stealKillsThread then stealKillsThread = nil end
-        logConsole("Steal Kills: Disabled", Color3.fromRGB(150, 30, 30))
+    elseif Console.Text == "Toggle NoClip: On" then
+        noclip = false
+        Console.Text = "Toggle NoClip: Off"
+        Console.TextColor3 = Color3.new(170,0,0)
+    elseif Console.Text == "Toggle NoClip: On" then
+        noclip = true
+        Console.Text = "Toggle NoClip: On"
+        Console.TextColor3 = Color3.new(0,185,0)
     end
 end)
-yOff = yOff + 38
 
--- Auto Farm
-createToggleButton(contentFrame, "Auto Farm", yOff, function(btn, ind)
-    toggleStates.AutoFarm = not toggleStates.AutoFarm
-    updateIndicator(ind, toggleStates.AutoFarm)
-    if toggleStates.AutoFarm then
-        local function getNearest()
-            local nearest, dist = nil, 99999
-            pcall(function()
-                for _, v in pairs(Workspace.BossFolder:GetChildren()) do
-                    if v:FindFirstChild("Head") then
-                        local m = (LocalPlayer.Character.Head.Position - v.Head.Position).Magnitude
-                        if m < dist then dist = m; nearest = v end
-                    end
-                end
-            end)
-            pcall(function()
-                for _, v in pairs(Workspace.enemies:GetChildren()) do
-                    if v:FindFirstChild("Head") then
-                        local m = (LocalPlayer.Character.Head.Position - v.Head.Position).Magnitude
-                        if m < dist then dist = m; nearest = v end
-                    end
-                end
-            end)
-            return nearest
+Knifes.MouseButton1Click:connect(function()
+    for _,Thing in pairs(game.ReplicatedStorage.Knives:GetChildren()) do
+        if Thing:IsA("Tool") then
+            Thing.Parent = game.Players.LocalPlayer.Backpack
         end
-        farmConn = RunService.RenderStepped:Connect(function()
-            if not toggleStates.AutoFarm then return end
-            local char = LocalPlayer.Character
-            if not char or not char:FindFirstChild("HumanoidRootPart") then return end
+    end
+end)
+
+Guns.MouseButton1Click:connect(function()
+    for _,Thing in pairs(game.ReplicatedStorage.Guns:GetChildren()) do
+        if Thing:IsA("Tool") then
+            Thing.Parent = game.Players.LocalPlayer.Backpack
+        end
+    end
+end)
+
+KillPlatform.MouseButton1Click:connect(function()
+    plr = game:service'Players'.LocalPlayer
+    char = plr.Character
+    root = char.HumanoidRootPart
+    iszombie = false
+
+    platform = Instance.new('Part', workspace)
+    platform.Size = Vector3.new(100,0,100)
+    platform.Anchored = true
+    platform.Position = Vector3.new(555,555,555)
+    root.CFrame = platform.CFrame * CFrame.new(0,4,0)
+
+    if workspace:FindFirstChild(plr.Name) then
+        iszombie = false
+        warn'You are not a zombie!'
+    else
+        iszombie = true
+        warn'You are a zombie!'
+    end
+
+    wait(.5)
+
+    if not iszombie then
+        for _, a in pairs(workspace.enemies:children()) do
+            for _, b in pairs(a:children()) do
+                if b:IsA'Part' then
+                    b.Anchored = true
+                    b.CFrame = root.CFrame * CFrame.new(2,0,2)
+                end
+            end
+        end
+    elseif iszombie then
+        for _, a in pairs(game:service'Players':GetPlayers()) do
+            if a.Character then
+                for _, b in pairs(a.Character:children()) do
+                    if b:IsA'Part' and a.Name ~= plr.Name then
+                        b.Anchored = true
+                        b.CFrame =  root.CFrame * CFrame.new(2,0,2)
+                    end
+                end
+            end
+        end
+    end
+end)
+
+Speed.MouseButton1Click:connect(function()
+    plr = game:service'Players'.LocalPlayer
+    char = plr.Character
+    hum = char:FindFirstChildOfClass'Humanoid'
+    hum.WalkSpeed = 60
+end)
+
+Jump.MouseButton1Click:connect(function()
+    plr = game:service'Players'.LocalPlayer
+    char = plr.Character
+    hum = char:FindFirstChildOfClass'Humanoid'
+    hum.JumpPower = 100
+end)
+
+AutoFarm.MouseButton1Click:connect(function()
+    local groundDistance = 8
+    local Player = game:GetService("Players").LocalPlayer
+    local function getNearest()
+        local nearest, dist = nil, 99999
+        for _,v in pairs(game.Workspace.BossFolder:GetChildren()) do
+            if(v:FindFirstChild("Head")~=nil)then
+                local m =(Player.Character.Head.Position-v.Head.Position).magnitude
+                if(m<dist)then
+                    dist = m
+                    nearest = v
+                end
+            end
+        end
+        for _,v in pairs(game.Workspace.enemies:GetChildren()) do
+            if(v:FindFirstChild("Head")~=nil)then
+                local m =(Player.Character.Head.Position-v.Head.Position).magnitude
+                if(m<dist)then
+                    dist = m
+                    nearest = v
+                end
+            end
+        end
+        return nearest
+    end
+    _G.farm2 = true
+    Player.Chatted:Connect(function(m)
+        if(m==";autofarm false")then
+            _G.farm2 = false
+        elseif(m==";autofarm true")then
+            _G.farm2 = true
+        end
+    end)
+    _G.globalTarget = nil
+    game:GetService("RunService").RenderStepped:Connect(function()
+        if(_G.farm2==true)then
             local target = getNearest()
-            if target and target:FindFirstChild("HumanoidRootPart") then
-                char.HumanoidRootPart.CFrame = target.HumanoidRootPart.CFrame * CFrame.new(0, 8, 9)
-                globalTarget = target
-            end
-        end)
-        farmAttackThread = spawn(function()
-            while toggleStates.AutoFarm do
-                wait(0.05)
-                if globalTarget and globalTarget:FindFirstChild("Head") and LocalPlayer.Character and LocalPlayer.Character:FindFirstChildOfClass("Tool") then
-                    pcall(function()
-                        ReplicatedStorage.Gun:FireServer({
-                            Normal = Vector3.new(0,0,0),
-                            Direction = globalTarget.Head.Position,
-                            Name = LocalPlayer.Character:FindFirstChildOfClass("Tool").Name,
-                            Hit = globalTarget.Head,
-                            Origin = globalTarget.Head.Position,
-                            Pos = globalTarget.Head.Position,
-                        })
-                    end)
-                end
-            end
-        end)
-        spawn(function()
-            while toggleStates.AutoFarm do
-                wait()
-                pcall(function()
-                    if LocalPlayer.Character then
-                        LocalPlayer.Character.HumanoidRootPart.Velocity = Vector3.new(0,0,0)
-                        if LocalPlayer.Character:FindFirstChild("Torso") then
-                            LocalPlayer.Character.Torso.Velocity = Vector3.new(0,0,0)
-                        end
-                    end
-                end)
-            end
-        end)
-        logConsole("Auto Farm: Active", Color3.fromRGB(30, 180, 30))
-    else
-        if farmConn then farmConn:Disconnect(); farmConn = nil end
-        if farmAttackThread then farmAttackThread = nil end
-        globalTarget = nil
-        logConsole("Auto Farm: Disabled", Color3.fromRGB(150, 30, 30))
-    end
-end)
-yOff = yOff + 38
-
--- No Recoil
-createToggleButton(contentFrame, "No Recoil", yOff, function(btn, ind)
-    toggleStates.NoRecoil = not toggleStates.NoRecoil
-    updateIndicator(ind, toggleStates.NoRecoil)
-    if toggleStates.NoRecoil then
-        noRecoilThread = spawn(function()
-            while toggleStates.NoRecoil do
-                wait()
-                pcall(function()
-                    local char = LocalPlayer.Character
-                    if char then
-                        for _, tool in pairs(char:GetChildren()) do
-                            if tool:IsA("Tool") then
-                                for _, mod in pairs(tool:GetDescendants()) do
-                                    if mod:IsA("Configuration") then
-                                        for _, val in pairs(mod:GetChildren()) do
-                                            if val.Name:lower():find("recoil") and val:IsA("ValueBase") then
-                                                val.Value = 0
-                                            end
-                                        end
-                                    end
-                                end
-                            end
-                        end
-                    end
-                end)
-            end
-        end)
-        logConsole("No Recoil: Active", Color3.fromRGB(30, 180, 30))
-    else
-        if noRecoilThread then noRecoilThread = nil end
-        logConsole("No Recoil: Disabled", Color3.fromRGB(150, 30, 30))
-    end
-end)
-yOff = yOff + 38
-
--- Equip All Guns
-createActionButton(contentFrame, "Equip All Guns", yOff, function()
-    pcall(function()
-        for _, thing in pairs(ReplicatedStorage.Guns:GetChildren()) do
-            if thing:IsA("Tool") then thing.Parent = LocalPlayer.Backpack end
-        end
-    end)
-    logConsole("Equipped all guns", Color3.fromRGB(80, 255, 80))
-end)
-yOff = yOff + 38
-
--- Equip All Knives
-createActionButton(contentFrame, "Equip All Knives", yOff, function()
-    pcall(function()
-        for _, thing in pairs(ReplicatedStorage.Knives:GetChildren()) do
-            if thing:IsA("Tool") then thing.Parent = LocalPlayer.Backpack end
-        end
-    end)
-    logConsole("Equipped all knives", Color3.fromRGB(80, 255, 80))
-end)
-yOff = yOff + 38
-
--- Fly Mode (E)
-createToggleButton(contentFrame, "Fly Mode (E)", yOff, function(btn, ind)
-    toggleStates.Fly = not toggleStates.Fly
-    updateIndicator(ind, toggleStates.Fly)
-    if toggleStates.Fly then
-        logConsole("Fly: Press E to toggle", Color3.fromRGB(80, 180, 255))
-        local flyScript = pcall(httpGet, "https://pastebin.com/raw/7rXZ9VNc")
-        if flyScript then loadstring(flyScript)() end
-    else
-        logConsole("Fly: Disabled", Color3.fromRGB(150, 30, 30))
-    end
-end)
-yOff = yOff + 38
-
--- NoClip
-createToggleButton(contentFrame, "NoClip", yOff, function(btn, ind)
-    toggleStates.Noclip = not toggleStates.Noclip
-    updateIndicator(ind, toggleStates.Noclip)
-    if toggleStates.Noclip then
-        noclipConn = RunService.Stepped:Connect(function()
-            if toggleStates.Noclip and LocalPlayer.Character then
-                local hum = LocalPlayer.Character:FindFirstChildOfClass("Humanoid")
-                if hum then hum:ChangeState(11) end
-            end
-        end)
-        logConsole("NoClip: Active", Color3.fromRGB(30, 180, 30))
-    else
-        if noclipConn then noclipConn:Disconnect(); noclipConn = nil end
-        logConsole("NoClip: Disabled", Color3.fromRGB(150, 30, 30))
-    end
-end)
-yOff = yOff + 38
-
--- Low Gravity
-createToggleButton(contentFrame, "Low Gravity", yOff, function(btn, ind)
-    toggleStates.Gravity = not toggleStates.Gravity
-    updateIndicator(ind, toggleStates.Gravity)
-    if toggleStates.Gravity then
-        Workspace.Gravity = 5
-        logConsole("Low Gravity: Active", Color3.fromRGB(30, 180, 30))
-    else
-        Workspace.Gravity = 196.2
-        logConsole("Gravity: Normal", Color3.fromRGB(150, 30, 30))
-    end
-end)
-yOff = yOff + 38
-
--- Super Speed
-createToggleButton(contentFrame, "Super Speed", yOff, function(btn, ind)
-    toggleStates.Speed = not toggleStates.Speed
-    updateIndicator(ind, toggleStates.Speed)
-    pcall(function()
-        local hum = LocalPlayer.Character and LocalPlayer.Character:FindFirstChildOfClass("Humanoid")
-        if hum then
-            hum.WalkSpeed = toggleStates.Speed and 60 or 16
-            logConsole(toggleStates.Speed and "Speed: 60" or "Speed: Normal", toggleStates.Speed and Color3.fromRGB(30,180,30) or Color3.fromRGB(150,30,30))
-        end
-    end)
-end)
-yOff = yOff + 38
-
--- Super Jump
-createToggleButton(contentFrame, "Super Jump", yOff, function(btn, ind)
-    toggleStates.Jump = not toggleStates.Jump
-    updateIndicator(ind, toggleStates.Jump)
-    pcall(function()
-        local hum = LocalPlayer.Character and LocalPlayer.Character:FindFirstChildOfClass("Humanoid")
-        if hum then
-            hum.JumpPower = toggleStates.Jump and 100 or 50
-            logConsole(toggleStates.Jump and "Jump: 100" or "Jump: Normal", toggleStates.Jump and Color3.fromRGB(30,180,30) or Color3.fromRGB(150,30,30))
-        end
-    end)
-end)
-yOff = yOff + 38
-
--- B-Tools
-createActionButton(contentFrame, "B-Tools", yOff, function()
-    local btScript = pcall(httpGet, "https://pastebin.com/raw/T0qaXjAR")
-    if btScript then loadstring(btScript)() end
-    logConsole("B-Tools Loaded", Color3.fromRGB(80, 255, 80))
-end)
-yOff = yOff + 38
-
--- Expand Zombie Hitboxes
-createToggleButton(contentFrame, "Expand Zombie Hitboxes", yOff, function(btn, ind)
-    toggleStates.HitboxExpand = not toggleStates.HitboxExpand
-    updateIndicator(ind, toggleStates.HitboxExpand)
-    if toggleStates.HitboxExpand then
-        local hitboxSize = Vector3.new(40,40,40)
-        hitboxConn = RunService.Heartbeat:Connect(function()
-            if not toggleStates.HitboxExpand then return end
-            pcall(function()
-                for _, obj in ipairs(Workspace:GetDescendants()) do
-                    if obj:IsA("BasePart") and obj.Parent and obj.Parent:FindFirstChild("Humanoid") and not Players:GetPlayerFromCharacter(obj.Parent) and obj.Parent:FindFirstChild("HumanoidRootPart") and obj.Parent.Humanoid.Health > 0 and not expandedParts[obj] then
-                        expandedParts[obj] = {OriginalSize = obj.Size, OriginalTransparency = obj.Transparency, OriginalCollision = obj.CanCollide}
-                        obj.Size = hitboxSize
-                        obj.Transparency = 0.85
-                        obj.CanCollide = false
-                        obj.Anchored = true
-                    end
-                end
-            end)
-        end)
-        logConsole("Hitbox Expand: Active", Color3.fromRGB(30, 180, 30))
-    else
-        if hitboxConn then hitboxConn:Disconnect(); hitboxConn = nil end
-        for obj, data in pairs(expandedParts) do
-            pcall(function()
-                if obj and obj.Parent then
-                    obj.Size = data.OriginalSize
-                    obj.Transparency = data.OriginalTransparency
-                    obj.CanCollide = data.OriginalCollision
-                    obj.Anchored = false
-                end
-            end)
-        end
-        expandedParts = {}
-        logConsole("Hitbox Expand: Disabled", Color3.fromRGB(150, 30, 30))
-    end
-end)
-yOff = yOff + 38
-
--- Weapon Reach Extender
-createToggleButton(contentFrame, "Weapon Reach Extender", yOff, function(btn, ind)
-    toggleStates.Reach = not toggleStates.Reach
-    updateIndicator(ind, toggleStates.Reach)
-    if toggleStates.Reach then
-        local reachSize = Vector3.new(60,60,60)
-        reachConn = RunService.Heartbeat:Connect(function()
-            if not toggleStates.Reach then return end
-            pcall(function()
-                local char = LocalPlayer.Character
-                if not char then return end
-                for _, tool in ipairs(char:GetChildren()) do
-                    if tool:IsA("Tool") and tool:FindFirstChild("Handle") then
-                        local handle = tool.Handle
-                        handle.Size = reachSize
-                        handle.Transparency = 1
-                        handle.CanCollide = false
-                        handle.Massless = true
-                    end
-                end
-            end)
-        end)
-        logConsole("Reach Extender: Active", Color3.fromRGB(30, 180, 30))
-    else
-        if reachConn then reachConn:Disconnect(); reachConn = nil end
-        logConsole("Reach Extender: Disabled", Color3.fromRGB(150, 30, 30))
-    end
-end)
-yOff = yOff + 38
-
--- Teleport to Map Center
-createActionButton(contentFrame, "Teleport to Map Center", yOff, function()
-    local char = LocalPlayer.Character
-    if not char then return end
-    local root = char:FindFirstChild("HumanoidRootPart")
-    if not root then return end
-    local mapCenter = nil
-    pcall(function()
-        for _, obj in ipairs(Workspace:GetDescendants()) do
-            if obj.Name:lower():find("spawn") and obj:IsA("BasePart") then
-                mapCenter = obj.Position
-                break
+            if(target~=nil)then
+                game:GetService("Workspace").CurrentCamera.CFrame = CFrame.new(game:GetService("Workspace").CurrentCamera.CFrame.p, target.Head.Position)
+                Player.Character.HumanoidRootPart.CFrame = (target.HumanoidRootPart.CFrame * CFrame.new(0, groundDistance, 9))
+                _G.globalTarget = target
             end
         end
     end)
-    if not mapCenter then
-        pcall(function()
-            local total, count = Vector3.new(0,0,0), 0
-            for _, obj in ipairs(Workspace:GetDescendants()) do
-                if obj:FindFirstChild("Humanoid") and obj:FindFirstChild("HumanoidRootPart") and not Players:GetPlayerFromCharacter(obj) then
-                    total = total + obj.HumanoidRootPart.Position
-                    count = count + 1
-                end
-            end
-            if count > 0 then mapCenter = total / count end
-        end)
-    end
-    if not mapCenter then mapCenter = Vector3.new(0, 50, 0) end
-    root.CFrame = CFrame.new(mapCenter.X, mapCenter.Y + 50, mapCenter.Z)
-    local hum = char:FindFirstChildOfClass("Humanoid")
-    if hum then hum.PlatformStand = true end
-    root.Anchored = true
-    logConsole("Teleported to center", Color3.fromRGB(80, 255, 80))
-end)
-yOff = yOff + 38
-
--- Обновляем размер холста
-contentFrame.CanvasSize = UDim2.new(0, 0, 0, yOff + 20)
-
--- ========== ОБНОВЛЕНИЕ СТАТУСА ПРИ РЕСПАВНЕ ==========
-LocalPlayer.CharacterAdded:Connect(function(char)
-    wait(1)
-    pcall(function()
-        local hum = char:FindFirstChildOfClass("Humanoid")
-        if hum then
-            if toggleStates.Speed then hum.WalkSpeed = 60 end
-            if toggleStates.Jump then hum.JumpPower = 100 end
+    spawn(function()
+        while wait() do
+            game.Players.LocalPlayer.Character.HumanoidRootPart.Velocity = Vector3.new(0,0,0)
+            game.Players.LocalPlayer.Character.Torso.Velocity = Vector3.new(0,0,0)
         end
     end)
-end)
-
--- ========== ГОРЯЧАЯ КЛАВИША K ==========
-UserInputService.InputBegan:Connect(function(input, gameProcessed)
-    if gameProcessed then return end
-    if input.KeyCode == Enum.KeyCode.K then
-        mainFrame.Visible = not mainFrame.Visible
+    while wait() do
+        if(_G.farm2==true and _G.globalTarget~=nil and _G.globalTarget:FindFirstChild("Head") and Player.Character:FindFirstChildOfClass("Tool"))then
+            local target = _G.globalTarget
+            game.ReplicatedStorage.Gun:FireServer({["Normal"] = Vector3.new(0, 0, 0), ["Direction"] = target.Head.Position, ["Name"] = Player.Character:FindFirstChildOfClass("Tool").Name, ["Hit"] = target.Head, ["Origin"] = target.Head.Position, ["Pos"] = target.Head.Position,})
+            wait()
+        end
     end
 end)
 
--- ========== НАЧАЛО ==========
-logConsole("Zombie Attack Hub loaded. Press K to toggle", Color3.fromRGB(80, 255, 80))
+Btools.MouseButton1Click:connect(function()
+    loadstring(game:HttpGet("https://pastebin.com/raw/T0qaXjAR", true))()
+end)
 
--- Уведомление
-local notify = Instance.new("TextLabel")
-notify.Size = UDim2.new(0, 280, 0, 36)
-notify.Position = UDim2.new(0.5, -140, 0.1, 0)
-notify.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
-notify.Text = "Zombie Attack Hub loaded! Press K"
-notify.TextColor3 = Color3.fromRGB(255, 255, 255)
-notify.TextSize = 16
-notify.Font = Enum.Font.GothamBold
-notify.BackgroundTransparency = 0.2
-notify.BorderSizePixel = 0
-notify.Parent = screenGui
-Instance.new("UICorner", notify).CornerRadius = UDim.new(0, 8)
-game:GetService("Debris"):AddItem(notify, 3)
+Gravity.MouseButton1Click:connect(function()
+    game.Workspace.Gravity = 5
+end)

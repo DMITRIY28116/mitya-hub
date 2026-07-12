@@ -1,0 +1,287 @@
+-- Fox Ghost Farmer (Noclip Always On + Walk in Air)
+if not game:IsLoaded() then game.Loaded:Wait() end
+task.wait(2)
+
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local LocalPlayer = Players.LocalPlayer
+
+local AutoCollectActive = false
+local AutoBuffActive = false
+local AutoBombActive = false
+local FlySpeed = 800 
+local StopDistance = 20 
+local GrabbedCount = 0
+local MaxGrabsBeforePause = 3
+local PauseTime = 4
+
+-- НОКЛИП (Включен всегда во время фарма, чтобы не проваливаться)
+local noclipConn = nil
+local function StartNoclip()
+    if noclipConn then return end
+    noclipConn = RunService.Stepped:Connect(function()
+        pcall(function()
+            local char = LocalPlayer.Character
+            if char then
+                for _, part in ipairs(char:GetDescendants()) do
+                    if part:IsA("BasePart") then part.CanCollide = false end
+                end
+            end
+        end)
+    end)
+end
+
+local function StopNoclip()
+    if noclipConn then
+        noclipConn:Disconnect()
+        noclipConn = nil
+        pcall(function()
+            local char = LocalPlayer.Character
+            if char then
+                for _, part in ipairs(char:GetDescendants()) do
+                    if part:IsA("BasePart") then part.CanCollide = true end
+                end
+            end
+        end)
+    end
+end
+
+-- GUI
+local Gui = Instance.new("ScreenGui")
+Gui.Name = "FoxGhostFarmer"
+Gui.ResetOnSpawn = false
+Gui.Parent = LocalPlayer:WaitForChild("PlayerGui")
+
+local Frame = Instance.new("Frame")
+Frame.Size = UDim2.new(0, 220, 0, 140)
+Frame.Position = UDim2.new(0, 10, 0, 10)
+Frame.BackgroundColor3 = Color3.fromRGB(18, 18, 25)
+Frame.Parent = Gui
+Instance.new("UICorner", Frame).CornerRadius = UDim.new(0, 8)
+
+local Title = Instance.new("TextLabel")
+Title.Size = UDim2.new(1, 0, 0, 20)
+Title.BackgroundTransparency = 1
+Title.Text = "GHOST FARMER"
+Title.TextColor3 = Color3.fromRGB(0, 255, 120)
+Title.TextScaled = true
+Title.Font = Enum.Font.GothamBold
+Title.Parent = Frame
+
+local Status = Instance.new("TextLabel")
+Status.Size = UDim2.new(1, 0, 0, 15)
+Status.Position = UDim2.new(0, 0, 0, 20)
+Status.BackgroundTransparency = 1
+Status.Text = "Статус: Готов"
+Status.TextColor3 = Color3.fromRGB(200, 200, 200)
+Status.TextScaled = true
+Status.Font = Enum.Font.Gotham
+Status.Parent = Frame
+
+local function CreateBtn(name, yPos, color)
+    local btn = Instance.new("TextButton")
+    btn.Size = UDim2.new(0.9, 0, 0, 25)
+    btn.Position = UDim2.new(0.05, 0, 0, yPos)
+    btn.BackgroundColor3 = color
+    btn.Text = name
+    btn.TextColor3 = Color3.fromRGB(255, 255, 255)
+    btn.TextScaled = true
+    btn.Font = Enum.Font.GothamSemibold
+    btn.Parent = Frame
+    Instance.new("UICorner", btn).CornerRadius = UDim.new(0, 6)
+    return btn
+end
+
+local CollectBtn = CreateBtn("СБОР (ПРИЗРАК)", 40, Color3.fromRGB(0, 140, 70))
+local BuffsBtn = CreateBtn("АВТО БАФФЫ", 70, Color3.fromRGB(0, 80, 170))
+local BombsBtn = CreateBtn("АВТО БОМБЫ", 100, Color3.fromRGB(140, 20, 20))
+
+-- Поиск ближайшего предмета
+local function FindNearestItem()
+    local nearest = nil
+    local minDist = math.huge
+    
+    pcall(function()
+        local char = LocalPlayer.Character
+        if not char or not char:FindFirstChild("HumanoidRootPart") then return end
+        local myPos = char.HumanoidRootPart.Position
+        
+        for _, obj in ipairs(workspace:GetDescendants()) do
+            if obj:IsA("Tool") then
+                local isHeld = false
+                if obj.Parent and obj.Parent:IsA("Model") and obj.Parent:FindFirstChild("Humanoid") then
+                    isHeld = true
+                end
+                
+                if not isHeld then
+                    local handle = obj:FindFirstChild("Handle")
+                    if handle then
+                        local dist = (myPos - handle.Position).Magnitude
+                        if dist < minDist then
+                            minDist = dist
+                            nearest = obj
+                        end
+                    end
+                end
+            end
+        end
+    end)
+    
+    return nearest
+end
+
+-- Луп сбора
+local function FastCollectLoop()
+    -- Включаем ноклип на ВЕСЬ процесс фарма (чтобы не провалиться)
+    StartNoclip()
+    
+    while AutoCollectActive do
+        task.wait(0.5)
+        pcall(function()
+            -- КД после 3 предметов
+            if GrabbedCount >= MaxGrabsBeforePause then
+                Status.Text = "Отдых... (" .. PauseTime .. " сек)"
+                Status.TextColor3 = Color3.fromRGB(255, 200, 0)
+                task.wait(PauseTime)
+                GrabbedCount = 0
+            end
+            
+            local char = LocalPlayer.Character
+            if not char or not char:FindFirstChild("HumanoidRootPart") or not char:FindFirstChild("Humanoid") then return end
+            local root = char.HumanoidRootPart
+            local hum = char.Humanoid
+            
+            local item = FindNearestItem()
+            if item then
+                local handle = item:FindFirstChild("Handle")
+                if handle then
+                    local dist = (root.Position - handle.Position).Magnitude
+                    
+                    -- 1. ПОЛЕТ (Если дальше 20 стадов)
+                    if dist > StopDistance then
+                        Status.Text = "Летим..."
+                        hum.PlatformStand = true
+                        
+                        local direction = (handle.Position - root.Position).Unit
+                        local flyTarget = handle.Position - (direction * StopDistance) + Vector3.new(0, 5, 0)
+                        
+                        root.AssemblyLinearVelocity = direction * FlySpeed
+                        
+                        local timeout = 0
+                        while (root.Position - flyTarget).Magnitude > 5 do
+                            local dt = RunService.Heartbeat:Wait()
+                            timeout = timeout + dt
+                            if timeout > 5 then break end
+                            if not AutoCollectActive then break end
+                            local newDir = (flyTarget - root.Position).Unit
+                            root.AssemblyLinearVelocity = newDir * FlySpeed
+                        end
+                        
+                        -- 2. ОСТАНОВКА В ВОЗДУХЕ (Ноклип всё ещё включен, ты не падаешь)
+                        root.AssemblyLinearVelocity = Vector3.new(0, 0, 0)
+                        root.Velocity = Vector3.new(0, 0, 0)
+                        hum.PlatformStand = false -- Выключаем, чтобы можно было идти MoveTo
+                        
+                        -- 3. СИНХРОНИЗАЦИЯ С СЕРВЕРОМ
+                        Status.Text = "Синхронизация..."
+                        Status.TextColor3 = Color3.fromRGB(255, 100, 0)
+                        task.wait(1.5)
+                    end
+                    
+                    -- 4. ИДЕМ ПЕШКОМ ПО ВОЗДУХУ (MoveTo)
+                    Status.Text = "Идем к предмету..."
+                    Status.TextColor3 = Color3.fromRGB(0, 255, 120)
+                    hum:MoveTo(handle.Position)
+                    
+                    local walkTimeout = 0
+                    while (root.Position - handle.Position).Magnitude > 5 and walkTimeout < 3 do
+                        task.wait(0.1)
+                        walkTimeout = walkTimeout + 0.1
+                        if not AutoCollectActive then break end
+                    end
+                    
+                    task.wait(0.2)
+                    
+                    -- 5. ХВАТАЕМ
+                    Status.Text = "Берем!"
+                    local prompt = item:FindFirstChild("ProximityPrompt", true)
+                    if prompt then
+                        pcall(function() fireproximityprompt(prompt) end)
+                    else
+                        pcall(function() keypress(0x46) task.wait(0.05) keyrelease(0x46) end)
+                    end
+                    
+                    GrabbedCount = GrabbedCount + 1
+                    Status.Text = "Взято: " .. GrabbedCount .. "/" .. MaxGrabsBeforePause
+                    
+                    task.wait(0.5)
+                end
+            end
+        end)
+    end
+    
+    -- Выключаем ноклип ТОЛЬКО когда остановили фарм
+    Status.Text = "Статус: Готов"
+    Status.TextColor3 = Color3.fromRGB(200, 200, 200)
+    GrabbedCount = 0
+    StopNoclip()
+end
+
+-- Луп юза
+local function AutoUseLoop()
+    while task.wait(1.5) do
+        pcall(function()
+            local char = LocalPlayer.Character
+            if not char or not char:FindFirstChild("Humanoid") then return end
+            local hum = char.Humanoid
+            local backpack = LocalPlayer.Backpack
+            
+            for _, tool in ipairs(backpack:GetChildren()) do
+                if tool:IsA("Tool") then
+                    local name = tool.Name:lower()
+                    local isBomb = name:find("bomb") or name:find("tnt") or name:find("dynamite") or name:find("grenade") or name:find("explode") or name:find("c4")
+                    
+                    if AutoBuffActive and not isBomb then
+                        hum:EquipTool(tool)
+                        task.wait(0.1)
+                        tool:Activate()
+                        task.wait(0.3)
+                        hum:UnequipTools()
+                        task.wait(0.05)
+                    end
+                    
+                    if AutoBombActive and isBomb then
+                        hum:EquipTool(tool)
+                        task.wait(0.1)
+                        tool:Activate()
+                        task.wait(0.3)
+                        hum:UnequipTools()
+                        task.wait(0.05)
+                    end
+                end
+            end
+        end)
+    end
+end
+
+task.spawn(AutoUseLoop)
+
+-- КНОПКИ
+CollectBtn.MouseButton1Click:Connect(function()
+    AutoCollectActive = not AutoCollectActive
+    CollectBtn.Text = AutoCollectActive and "СБОР: ON" or "СБОР (ПРИЗРАК)"
+    CollectBtn.BackgroundColor3 = AutoCollectActive and Color3.fromRGB(0, 200, 100) or Color3.fromRGB(0, 140, 70)
+    if AutoCollectActive then task.spawn(FastCollectLoop) end
+end)
+
+BuffsBtn.MouseButton1Click:Connect(function()
+    AutoBuffActive = not AutoBuffActive
+    BuffsBtn.Text = AutoBuffActive and "БАФФЫ: ON" or "АВТО БАФФЫ"
+    BuffsBtn.BackgroundColor3 = AutoBuffActive and Color3.fromRGB(0, 120, 220) or Color3.fromRGB(0, 80, 170)
+end)
+
+BombsBtn.MouseButton1Click:Connect(function()
+    AutoBombActive = not AutoBombActive
+    BombsBtn.Text = AutoBombActive and "БОМБЫ: ON" or "АВТО БОМБЫ"
+    BombsBtn.BackgroundColor3 = AutoBombActive and Color3.fromRGB(200, 30, 30) or Color3.fromRGB(140, 20, 20)
+end)
